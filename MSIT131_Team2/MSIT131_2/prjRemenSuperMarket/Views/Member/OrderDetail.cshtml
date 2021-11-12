@@ -1,0 +1,57 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.COrderDetailViewModel>
+
+@{
+    ViewData["Title"] = "OrderDetail";
+}
+
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/order.jpg);">
+        <h2 class="tit6 t-center">
+            我的訂單
+        </h2>
+    </section>
+    <section class="product-details bg2-pattern p-t-55 p-b-113">
+        <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>                       
+                        <th>
+                            @Html.DisplayNameFor(model => model.SalesInfo)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.PictureBase64)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Counts)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Subtotal)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>                           
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SalesInfo)
+                            </td>
+                            <th>
+                                <img class="card-img-top" src="data:image/jpeg;base64,@item.PictureBase64" style="width:100px" />
+                            </th>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Counts)
+                            </td>
+                            <td>
+                                $ @((int?)item.Subtotal)
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>

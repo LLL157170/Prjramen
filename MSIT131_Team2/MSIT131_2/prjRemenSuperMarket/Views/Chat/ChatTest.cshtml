@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewData["Title"] = "ChatTest";
+}
+<div style="height:160px"></div>
+<form >
+    <div class="container">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-4"><input type="hidden" name="UserName" id="userInput" value="@ViewBag.txtName" /></div>
+        </div>
+        <div class="row">
+            <div class="col-2">Message</div>
+            <div class="col-4"><input type="text" id="messageInput" name="txtmes" /></div>
+
+            <input type="hidden" name="connectedId" id="connectionId" />
+        </div>
+        <div class="row">
+            接收人
+            <div id="aa">
+            </div>
+
+        </div>
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-6">
+                <input type="submit" id="sendToUser" value="Send Message" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+</form>
+@section Scripts{
+    <script>
+        function load() {
+            var inputuser = document.getElementById('userInput').value;
+            console.log(inputuser);
+            if (inputuser == "小黑") {
+                let sel = document.createElement("select")
+                sel.name = "recivename"
+                sel.id = "recivename"
+                document.getElementById("aa").appendChild(sel)
+
+                let recivename = document.querySelector('#recivename')
+                async function Load_Name() {
+                    const response = await fetch('/Chat/Load_member_List')
+                    const data = await response.json()
+                    data.forEach((item) => {
+                        const opt = new Option(item.name, item.name)
+                        recivename.options.add(opt)
+                    })
+                }
+                Load_Name();
+            }
+            if (inputuser != "小黑") {
+                let inp = document.createElement("input")
+                inp.name = "recivename"
+                inp.id = "recivename"
+                inp.type = "hidden"
+                inp.value = "小黑"
+                document.getElementById("aa").appendChild(inp)
+            }
+        }
+        load();
+
+
+
+    </script>
+
+}
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

@@ -1,0 +1,324 @@
+﻿@{
+    ViewData["Title"] = "PushPage";
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+@section Styles{
+    <style>
+        #LetsBegin div p {
+            font-size: 20px;
+        }
+    </style>
+}
+
+<body class="animsition">
+
+
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="background-image: url(/images/HomePage.jpg);">
+        <h2 class="tit6 t-center">
+            編輯推廣店家
+        </h2>
+    </section>
+
+    <section id="LetsBegin" class="section-SaleInfo bg1-pattern p-t-55 p-b-113">
+        <div style="min-width:200px;" class="d-flex align-items-center flex-column">
+            <h1>開始推廣您的拉麵店</h1>
+            <p>點擊下方"新增店家"按鈕上傳店家資料，成為VIP會員，讓瀏覽網站的顧客們看見您的拉麵店</p>
+            <p>成為VIP會員後，訂購我們食材-商城的正常價食材時，將享有9折優惠</p>
+            <p>讓您能用最新鮮的食材，做出品質最優良的拉麵。</p>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal" id="StoreAddBtn_Begin">新增店家</button>
+        </div>
+    </section>
+
+    <section id="EditPage" class="section-SaleInfo bg1-pattern p-t-55 p-b-113" hidden="hidden">
+        <div class="container">
+            <div class="row g-3" style="margin-bottom:50px">
+
+                <div class="form-row">
+                    <div class="col-md-0">
+                        <label style="font-size:18px">推廣店名：</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="SelStoreName"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" id="StoreEditBtn">編輯店家</button>
+
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addModal" id="StoreAddRamen">新增商品</button>
+
+                    </div>
+                    <div class="d-flex col-md-7" style="justify-content:right">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal" id="StoreAddBtn">新增店家</button>
+
+                    </div>
+                </div>
+            </div>
+
+            <hr style="width:1250px; height:2px; margin:auto" />
+            <div id="DivList">
+
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="ModalLabel"></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger mr-auto" id="DeleteBtn"></button>
+                    <button type="submit" class="btn btn-primary" id="SubmitButton"></button>
+                    <button class="demo btn btn-primary" id="demo">demo</button>
+                    <button class="btn btn-primary" id="demo2">新增5個產品</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+@section Scripts{
+    <script>
+//--------------------------------------------------列表載入--------------------------------------------------
+
+        async function Load_Selector_List(Selector, LoadList) {
+            $(Selector).empty()
+
+            const response = await fetch('/SelectorList/' + LoadList)
+            const datas = await response.json()
+
+            $.each(datas, (index, data) => {
+                $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+            })
+
+            if ($(Selector).attr('id') == 'SelStoreName') {
+                $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                Check_Has_RamenStore()
+            }
+
+
+        }
+
+        function Check_Has_RamenStore() {
+            let HasRamenStore = $('#SelStoreName').find('option').length != 0
+
+            $('#LetsBegin').attr('hidden', HasRamenStore)
+            $('#EditPage').attr('hidden', !HasRamenStore)
+
+        }
+
+        $('#SelStoreName').change(() => {
+            $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+        })
+
+        Load_Selector_List($('#SelStoreName'), 'RamenStore')
+
+//------------------------------------------------店家新增、修改------------------------------------------------
+
+        function Load_StoreAdd_Page() {
+            $('.modal-dialog').addClass('modal-xl')
+            $('.modal-dialog').removeClass('modal-lg')
+            $('#ModalLabel').text('新增推廣店家')
+            $('#SubmitButton').text('新增')
+            $('#SubmitButton').off('click')
+            $('#SubmitButton').click(Add_Store)
+            $('#DeleteBtn').attr('hidden',true)
+
+            $('.modal-body').empty();
+            $('.modal-body').load('/RamenStore/_PushPage_Store_Add')
+        }
+
+        function Load_StoreEdit_Page() {
+            $('.modal-dialog').addClass('modal-xl')
+            $('.modal-dialog').removeClass('modal-lg')
+            $('#ModalLabel').text('修改推廣店家')
+            $('#SubmitButton').text('修改')
+            $('#SubmitButton').off('click')
+            $('#SubmitButton').click(Edit_Store)
+            $('#DeleteBtn').text('刪除店家')
+            $('#DeleteBtn').attr('hidden', false)
+            $('#DeleteBtn').off('click')
+            $('#DeleteBtn').click(Delete_Store)
+
+            $('.modal-body').empty();
+            $('.modal-body').load('/RamenStore/_PushPage_Store_Edit?id=' + $('#SelStoreName').val())
+        }
+
+        function Add_Store() {
+            if ($('form').valid()) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData(document.theForm)
+
+                xhr.addEventListener('load', async function () {
+                    $('#addModal').modal('hide')
+                    await Load_Selector_List($('#SelStoreName'), 'RamenStore')
+
+                    Check_Has_RamenStore()
+                    $('#SelStoreName').val($('#SelStoreName option:last-child').val())
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+                xhr.open('post', '@Url.Content("~/RamenStore/StoreAdd")')
+                xhr.send(formData)
+            }
+        }
+
+        function Edit_Store() {
+            if ($('form').valid()) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData(document.theForm)
+
+                xhr.addEventListener('load', function () {
+                    $('#addModal').modal('hide')
+                    Load_Selector_List($('#SelStoreName'), 'RamenStore')
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+
+                xhr.open('post', '@Url.Content("~/RamenStore/StoreEdit")')
+                xhr.send(formData)
+            }
+        }
+
+        function Delete_Store() {
+            let StoreName = $('#SelStoreName').find('option:selected').text()
+            let Warning1 = confirm(`確定要刪除店家"${StoreName}"嗎？`);
+
+            let Warning2 = true
+
+            let ProductCount = $('#DivList').find('tbody>tr').length
+            if (ProductCount > 0)
+                Warning2 = confirm(`該店家內有${ProductCount}件商品，刪除店家會連同商品一起刪除\n\n確定要刪除店家嗎？`);
+
+            if (Warning1 && Warning2) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData()
+                formData.append('id', $('#SelStoreName').val())
+
+                xhr.addEventListener('load', async function () {
+                    $('#addModal').modal('hide')
+                    await Load_Selector_List($('#SelStoreName'), 'RamenStore')
+
+                    Check_Has_RamenStore()
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+
+                xhr.open('post', '@Url.Content("~/RamenStore/StoreDelete")')
+                xhr.send(formData)
+            }
+        }
+
+        $('#StoreAddBtn').click(Load_StoreAdd_Page)
+        $('#StoreEditBtn').click(Load_StoreEdit_Page)
+        $('#StoreAddBtn_Begin').click(Load_StoreAdd_Page)
+
+
+//------------------------------------------商品新增、修改-----------------------------------------------
+        let EditID
+        let AddStoreID
+
+        function Load_RamenAdd_Page() {
+            AddStoreID = $('#SelStoreName').val()
+
+            $('.modal-dialog').addClass('modal-lg')
+            $('.modal-dialog').removeClass('modal-xl')
+            $('#ModalLabel').text('新增商品')
+            $('#SubmitButton').text('新增')
+            $('#SubmitButton').off('click')
+            $('#SubmitButton').click(Add_Ramen)
+            $('#DeleteBtn').attr('hidden', true)
+
+            $('.modal-body').empty();
+            $('.modal-body').load('/RamenStore/_PushPage_Ramen_Add')
+        }
+
+        function Load_RamenEdit_Page() {
+            $('.modal-dialog').addClass('modal-lg')
+            $('.modal-dialog').removeClass('modal-xl')
+            $('#ModalLabel').text('修改商品')
+            $('#SubmitButton').text('修改')
+            $('#SubmitButton').off('click')
+            $('#SubmitButton').click(Edit_Ramen)
+            $('#DeleteBtn').text('刪除商品')
+            $('#DeleteBtn').attr('hidden', false)
+            $('#DeleteBtn').off('click')
+            $('#DeleteBtn').click(Delete_Ramen)
+
+            EditID = $(this).parents('tr').find('td:last-child').text()
+
+            $('.modal-body').empty();
+            $('.modal-body').load('/RamenStore/_PushPage_Ramen_Edit?id=' + EditID)
+        }
+
+        function Add_Ramen() {
+            if ($('form').valid()) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData(document.theForm)
+
+                xhr.addEventListener('load', function () {
+                    $('#addModal').modal('hide')
+                    $('#SelStoreName').val(AddStoreID)
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+
+                xhr.open('post', '@Url.Content("~/RamenStore/RamenAdd")')
+                xhr.send(formData)
+            }
+        }
+
+        function Edit_Ramen() {
+            if ($('form').valid()) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData(document.theForm)
+
+                xhr.addEventListener('load', function () {
+                    $('#addModal').modal('hide')
+                    $('#SelStoreName').val(AddStoreID)
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+
+                xhr.open('post', '@Url.Content("~/RamenStore/RamenEdit")')
+                xhr.send(formData)
+            }
+        }
+
+        function Delete_Ramen() {
+            let ProductName = $('form[name="theForm"]').find('input[name="ProductName"]').val()
+            let Warning = confirm(`確定要刪除商品"${ProductName}"嗎？`);
+
+            if (Warning) {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData()
+                formData.append('id', $('#DivList').find('tbody').find('td:last-child').text())
+
+                xhr.addEventListener('load', function () {
+                    $('#addModal').modal('hide')
+                    $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+                })
+
+                xhr.open('post', '@Url.Content("~/RamenStore/RamenDelete")')
+                xhr.send(formData)
+            }
+        }
+
+        $('#StoreAddRamen').click(Load_RamenAdd_Page)
+        $('#demo2').click(demodemo);
+        function demodemo() {
+            fetch('/PushDemo/index')
+            $('#addModal').modal('hide')
+            window.setTimeout(function () {
+                $('#DivList').load('/RamenStore/_PushPage_RamenList?storeID=' + $('#SelStoreName').val())
+            },1000);
+        }
+    </script>
+}
+

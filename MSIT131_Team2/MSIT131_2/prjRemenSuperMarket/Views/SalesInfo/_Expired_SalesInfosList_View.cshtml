@@ -1,0 +1,55 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CSalesInfo>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>編號</th>
+            <th>@Html.DisplayNameFor(model => model.GoodName)</th>
+            <th>@Html.DisplayNameFor(model => model.PriceFactor)</th>
+            <th>@Html.DisplayNameFor(model => model.UnitPrice)</th>
+            <th>@Html.DisplayNameFor(model => model.Counts)</th>
+            <th>@Html.DisplayNameFor(model => model.Discount)</th>
+            <th>@Html.DisplayNameFor(model => model.SalesStates)</th>
+            @*<th>編輯</th>*@
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count = 0;
+            @foreach (var item in Model)
+            {
+                count++;
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(modelItem => item.GoodName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PriceFactor)</td>
+                    <td>@Html.DisplayFor(modelItem => item.UnitPrice)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Counts)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Discount)</td>
+                    <td>@Html.DisplayFor(modelItem => item.SalesStates)</td>
+                    @*<td>
+                        @Html.ActionLink("修改", "Edit",
+                                          new { id = item.SalesInfoIdPk },
+                                          new { Class = "btn btn-success" })
+
+                        @Html.ActionLink("刪除", "Delete",
+                                          new { id = item.SalesInfoIdPk },
+                                          new
+                                               {
+                                                   Class = "btn btn-danger",
+                                              onclick = "return confirm('確定要刪除嗎?')"
+                                               })
+                    </td>*@
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@{
+    if (count == 0)
+    {
+        <h2 style="color:red; text-align:center"> 查無資料 </h2>
+    }
+}
+

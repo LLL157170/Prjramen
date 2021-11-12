@@ -1,0 +1,104 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.COrderViewModel>
+
+@{
+    ViewData["Title"] = "Eorder";
+}
+
+@section Styles{
+    <style>
+    </style>
+}
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/employee.jpg);">
+        <h2 class="tit6 t-center">
+            顧客訂單
+        </h2>
+    </section>
+    <section class="p-t-10" style="        background-color: #ebebeb;">
+        <div class="container">
+            <div style="margin-top:16px;margin-bottom:16px;">
+                @using (Html.BeginForm())
+                {
+                    <p>
+                        <span style="margin:10px">姓名查詢</span><input type="text" name="txtQuery" hint="輸入查詢資料" value="@ViewBag.x" style="background-color:antiquewhite" />
+                        <input type="submit" value="查詢" class="btn btn-info" />
+                    </p>
+                }
+            </div>
+            <div class="container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.membername)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.OrderDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ShipDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ShipAddress)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TotalPrice)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Payment)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.DeliveryStatus)
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.membername)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.OrderDate)
+                                </td>
+                                <td id="shipdate">
+                                    @Html.DisplayFor(modelItem => item.ShipDate)
+                                </td>
+                                <td>
+                                    @item.City @item.District @item.ShipAddress
+                                </td>
+                                <td id="totalprice">
+                                    $ @((int?)item.TotalPrice)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Payment)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DeliveryStatus)
+                                </td>
+                                <td @*class="social-cust-ColorToDeep"*@>
+                                    @Html.ActionLink("修改", "Editorder", "EMList", new { id = item.OrderIdPk }, new { @class = "btn btn-success" })
+                                    @Html.ActionLink("刪除", "Deleteorder", "EMList", new { id = item.OrderIdPk }, new { @class = "btn btn-danger" })
+                                    @Html.ActionLink("檢視", "EOrderDetail", "EMList", new { orderId = item.OrderIdPk }, new { @class = "btn btn-primary" })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination flex-c-m flex-w p-l-15 p-r-15 m-t-24 m-b-50" id="Page">
+                <button class="item-pagination flex-c-m trans-0-4 active-pagination">1</button>
+            </div>
+        </div>
+    </section>
+</body>
+<script>
+        //function content() {
+        //    let totalprice = $('#totalprice').text()
+        //    console.log(totalprice)
+        //}
+        //content()
+</script>

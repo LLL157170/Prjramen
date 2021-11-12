@@ -1,0 +1,690 @@
+﻿@model prjRemenSuperMarket.ViewModel.CProductDetail
+
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+@section Styles{
+    <style>
+        .dark {
+            filter: grayscale(1);
+        }
+
+        .light {
+            filter: grayscale(0);
+        }
+
+        .product__details__text {
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .product__details__price label {
+            font-size: 25px;
+            color: #ec1d25;
+        }
+
+        .wide-btn {
+            padding: 30px,0, 0, 30px;
+            color: white;
+            background-color: #d6060e;
+        }
+
+            .wide-btn:hover {
+                color: white;
+                background-color: #a80c12;
+            }
+
+        .ProduceDescribe {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .button {
+            font-size: 15px;
+            color: #ef910f;
+            background-color: white;
+            border-color: #ef910f;
+        }
+
+            .button:hover {
+                font-size: 15px;
+                color: white;
+                background-color: #ef910f;
+                border-color: #ef910f;
+            }
+
+
+        .button_clicked {
+            font-size: 15px;
+            color: white;
+            background-color: #ef910f;
+            border-color: #ef910f;
+        }
+
+            .button_clicked:hover {
+                color: white;
+            }
+    </style>
+}
+
+<body class="animsition">
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/ProductDetail.jpg);">
+        <h2 class="tit6 t-center">
+            @Model.ProductName
+        </h2>
+    </section>
+
+    <section class="product-details bg1-pattern p-t-55 p-b-113">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+
+                        <img class="product__details__pic__item--large" src="data:image/jpeg;base64,@Model.PictureBase64" style="width:500px" />
+
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    @if(Model.ProductIdPk == 206)
+                    {
+                        <a href="/ShoppingCart/Demo_All_In" class="btn btn-primary" style="float:right">Demo All In</a>
+                    }
+
+                    <div class="product__details__text">
+                        <label>
+                            @Model.ProductName
+
+                            <label id="labOutStock" hidden="hidden" style="color:red">(缺貨中)</label>
+                            @*@if (ViewBag.IsLogin == true)
+                            {
+                                <i class="bi-megaphone" style="color:orangered"></i>
+                                <label style="color:orangered" hidden="hidden">(補貨時通知我)</label>
+                                <input name="PID@(Model.ProductIdPk)" value="@Model.ProductIdPk" hidden="hidden">
+                            }*@
+                        </label>
+                    </div>
+
+                    <div class="product__details__price">
+                        @if (ViewBag.IsVIP == true)
+                        {
+                            <label id="price" style="text-decoration:line-through">$@((int?)Model.NormalPrice) </label>
+                            <div id="VIPprice">
+                                <label  style="font-size:30px">
+                                    $@((int?)(Model.NormalPrice*0.9))
+                                </label>
+                                <span style="color:red">VIP優惠9折</span>
+                            </div>
+                            
+
+                        }
+                        else
+                        {
+                            <label id="price">$@((int?)Model.NormalPrice)</label>
+                        }
+
+                    </div>
+                    <div id="starshow">
+
+                    </div>
+                    <div id="textstar">
+
+                    </div>
+                    <div class=" p-t-20 p-b-20" id="buttons">
+                        <button type="button" class="btn button_clicked" id="firstbtn">正常價</button>
+                        <button type="button" class="btn button">即期價</button>
+                        <button type="button" class="btn button">特價</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ProductDescription" class="control-label"></label>
+                        <label> :</label>
+                        <label>
+                            @Model.ProductDescription
+                        </label>
+                    </div>
+
+                    <form asp-controller="ShoppingCart" asp-action="AddtoCart" name="theForm">
+                        <div class="p-t-20">
+                            <div id="adjustDiv">
+                                <span style="font-size:22px; font-weight:bolder; padding-right:10px; padding-left:70px;">數量 : </span>
+                                <span style="padding-right:10px">
+                                    <input name="id" hidden="hidden" value="@Model.NormalSalesInfoId" />
+                                    <input id="nb" name="cn" type="number" class="number" value="1" min="1" max="@Model.NormalCount" style="        background-color: #545454;color:white">
+                                </span>
+                                <span>
+                                    <label id="count" style="font-size:14px;color: #a3a2a2; padding-right: 100px">庫存 @Model.NormalCount 件</label>
+                                </span>
+
+                                <span class="">
+                                    <a id="al" href="#" class="btn wide-btn">加入購物車</a>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="p-t-90 p-b-15">
+                        <div class="ProduceDescribe">
+                            <label>商品規格</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Text_Storage" class="control-label" style="width:100px"></label>
+                            <label> @Model.Text_Storage</label>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Views" class="control-label" style="width:100px"></label>
+                            <label> @Model.Views</label>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Specification" class="control-label" style="width:100px"></label>
+                            <label> @Model.Specification</label>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Weight" class="control-label" style="width:100px"></label>
+                            <label> @Model.Weight</label>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Origin" class="control-label" style="width:100px"></label>
+                            <label> @Model.Origin</label>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Storagedays" class="control-label" style="width:100px"></label>
+                            <label> @Model.Storagedays</label>
+
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                            <input type="submit" value="Save" class="btn btn-primary" />
+                        </div>*@
+                    <div class="social p-4 pt-0 border-top-0 bg-transparent text-center">
+                        <a class="btn btn-white mt-auto" asp-controller="Home" asp-action="Page">返回列表</a>
+                    </div>
+
+                    @*href="~/ShoppingCart/AddToCart?id=@product.SalesInfoIdPk*@
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="border:2px solid black">
+            <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+            <div class="row">
+                <div class="col-6">點擊評分 雙擊重選 </div>
+                <div class="col-6"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-8" id="exs">
+                    <img src="~/images/star.png" class="dark" />
+                    <img src="~/images/star.png" class="dark" />
+                    <img src="~/images/star.png" class="dark" />
+                    <img src="~/images/star.png" class="dark" />
+                    <img src="~/images/star.png" class="dark" />
+                </div>
+            </div>
+            <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+            <div class="row">
+                <textarea cols="50" rows="6" id="texe"></textarea>
+
+            </div>
+            <!-- Columns are always 50% wide on mobile and desktop -->
+            <div class="row">
+                <div class="col-6"><button class="btn btn-primary" style="margin:10px" id="sub">送出</button><button Class="btn btn-success" id="del">清除</button></div>
+                <div class="col-6"></div>
+            </div>
+        </div>
+        <div id="boxlist">
+        </div>
+    </section>
+
+    <input type="hidden" value="@ViewBag.txtId" id="s1" />
+    <input type="hidden" value="@ViewBag.ProductId" id="s2" />
+    <input type="hidden" id="mid" />
+
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+                        <div class="row form-group">
+                            <div class="col-6">請重新選擇星數 </div>
+                            <div class="col-6"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-8" id="exs">
+                                <img src="~/images/star.png" class="dark" />
+                                <img src="~/images/star.png" class="dark" />
+                                <img src="~/images/star.png" class="dark" />
+                                <img src="~/images/star.png" class="dark" />
+                                <img src="~/images/star.png" class="dark" />
+                            </div>
+                        </div>
+                        <!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop -->
+                        <div class="row form-group" style="border:1px solid black">
+                            <textarea cols="50" rows="6" id="text2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearData">關閉</button>
+                    <button type="button" class="btn btn-primary" id="btt">送出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        load()
+        let count
+        let c = true
+        //讀取留言
+        function load() {
+            $.ajax({
+                url: 'https://localhost:44333/ProductInfo/GetEval' + "/" + @ViewBag.ProductId,
+                type:'GET'
+            }).done(function (datas) {
+                let docFrag = $(document.createDocumentFragment())
+                let Frag = $(document.createDocumentFragment())
+                let ss
+                let people = 0
+                let stars = 0
+                let addmath
+                let id = $("#s1").val()
+                console.log(id)
+                $.each(datas, function (idx, item) {
+                    people += 1
+                    stars += item.evaluation1
+                    const cell1 = $('<div class="container" style="border:2px solid black"></div>')
+                    const cell2 = $('<div class="row"></div>')
+                    const cell3 = $(`<div class="col-6"  name="${item.memberIdFk}"></div>`) //會員ID
+                    const cell4 = $('<div class="col-6"></div>').text("留言時間"+item.date) //留言時間
+                    cell2.append(cell3, cell4)
+                    const cell5 = $('<div class="row"></div>')
+                    if (item.evaluation1 == 1) {
+                        ss = $("<img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                    } else if (item.evaluation1 == 2) {
+                        ss = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                    } else if (item.evaluation1 == 3) {
+                        ss = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                    } else if (item.evaluation1 == 4) {
+                        ss = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/>")
+                    } else {
+                        ss = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/>")
+                    }
+                    const cell6 = $(`<div class="col-md-8" id="x${item.evaluation1}"></div>`).append(ss) //照片位置
+                    cell5.append(cell6)
+                    let content = item.content
+                    content = content.replace(/<br>/g, "\n")
+                    const cell7 = $('<div class="row"></div>')
+                    const cont = $('<textarea cols="50" rows="6" id="texe" disabled></textarea>').text(content) //內容
+                    cell7.append(cont)
+                    const cell8 = $('<div class="row"></div>')
+                    const cell9 = $('<div class="col-6"></div>')
+                    const cell10 = $(' <div class="col-6"></div>')
+                    if (id == item.memberIdFk) {
+                    const cell11 = $(`<button Class = "btn btn-success" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" style="margin:10px" id="${item.evaluationIdPk}" onclick="edd()"></button>`).text('編輯')
+                        const cell12 = $(`<button class="btn btn-danger" id="${item.evaluationIdPk}" onclick="dd()"></button>`).text('刪除')
+                        cell10.append(cell11, cell12)
+                        Frag.append(cell10)
+                    }
+                    cell8.append(cell9, Frag)
+                    cell1.append(cell2, cell5, cell7, cell8)
+                    docFrag.append(cell1)
+                })
+                addmath = stars / people
+                $('#boxlist').html(docFrag)
+                mID()
+                shows(addmath)
+            })
+        }
+        //顯示平均星數 評分
+        function shows(s) {
+            let kk
+            let dd
+            if (s.toFixed() == 5) {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/>")
+                dd = s.toFixed(1) + "分"
+            }else if (s.toFixed() == 1) {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                dd = s.toFixed(1)+"分"
+            } else if (s.toFixed() == 2) {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                dd = s.toFixed(1) + "分"
+            } else if (s.toFixed() == 3) {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/><img src='/images/star.png' class='dark'/>")
+                dd = s.toFixed(1) + "分"
+            } else if (s.toFixed() == 4) {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png' class='dark'/>")
+                dd = s.toFixed(1) + "分"
+            } else {
+                kk = $("<img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/><img src='/images/star.png'/>")
+                dd = "未有評分"
+            }
+            $("#starshow").html(kk)
+            $("#textstar").html(dd)
+        }
+        //ID轉文字
+    function mID() {
+        $.ajax({
+            url: "https://localhost:44333/ProductInfo/GetMId",
+            type:'GET'
+        }).done(function (data) {
+            $.each(data, function (idx, item) {
+                $(`div[name="${item.memberIdPk}"]`).text(item.name)
+            })
+        })
+        }
+
+        $("#exs>img").on({
+            mousemove: function () {
+                if (c) {
+
+                $(this).prop("class", "light").prevAll().prop("class", "light")
+                }
+            }, mouseout: function () {
+                if (c) {
+                $(this).prop("class", "dark").prevAll().prop("class", "dark")
+                }
+            }, click: function () {
+                if (c) {
+                    c = false
+                    count = $(this).index() + 1
+                }
+            }, dblclick: function () {
+                if (!c) {
+                    $("#exs>img").prop("class","dark")
+                    c = true
+                }
+            }
+        })
+        //儲存留言
+        $('#sub').click(function () {
+            if (count < 1)
+                count = 1
+            let content = $("textarea").val()
+            content = content.replace(/\n|\r\n/g, "<br>")
+            const jsonData = JSON.stringify({
+                MemberIdFk:$('#s1').val(),
+                ProductIdFk:$('#s2').val(),
+                Evaluation1: count,
+                Content: content,
+                Date: new Date()
+            })
+            $.ajax({
+                url: 'https://localhost:44333/ProductInfo/PostEvaluation',
+                type: 'POST',
+                contentType: 'application/json',
+                data: jsonData
+            }).done(function (data) {
+                alert('留言成功')
+                $('#exs>img').attr("class","dark")
+                c = true
+                del()
+                load()
+            }).fail(function () {
+                alert('請先登入會員')
+            })
+
+        })
+        //取得修改資料
+        let editID
+        function edd() {
+            editID = event.target.id
+            $('#exs>img').attr("class", "dark")
+            c = true
+            $.ajax({
+                url: "https://localhost:44333/ProductInfo/EditEval" + "/" + editID,
+                type: 'GET'
+            }).done(function (data) {
+                $.each(data, function (idx, item) {
+                    let content = item.content
+                    content = content.replace(/<br>/g, "\n")
+                    $("#text2").val(content)
+                    $("#mid").val(item.memberIdFk)
+                })
+            })
+        }
+        //修改儲存
+        $("#btt").click(function () {
+            if (count < 1)
+                count = 1
+            let content = $("#text2").val()
+            content = content.replace(/\n|\r\n/g, "<br>")
+           const jsonData = JSON.stringify({
+               MemberIdFk: $("#mid").val(),
+                ProductIdFk: $('#s2').val(),
+                Evaluation1: count,
+                Content: content,
+                Date: new Date()
+           })
+            $.ajax({
+                url: "https://localhost:44333/ProductInfo/PutEval" + "/" + editID,
+                type: "PUT",
+                contentType: 'application/json',
+                data:jsonData
+            }).done(function () {
+                alert("修改成功")
+                load()
+            })
+            $('#addModal').modal('hide')
+        })
+        //$('#sub').click(function () {
+        //    if (count < 1)
+        //        count = 1
+        //    let content = $("textarea").val()
+        //    content = content.replace(/\n|\r\n/g, "<br>")
+        //    const jsonData = JSON.stringify({
+        //        MemberIdFk: $('#s1').val(),
+        //        ProductIdFk: $('#s2').val(),
+        //        Evaluation1: count,
+        //        Content: content,
+        //        Date: new Date()
+        //    })
+        //    $.ajax({
+        //        url: 'https://localhost:44333/ProductInfo/PostEvaluation',
+        //        type: 'POST',
+        //        contentType: 'application/json',
+        //        data: jsonData
+        //    }).done(function (data) {
+        //        alert('留言成功')
+        //        $('#exs>img').attr("class", "dark")
+        //        c = true
+        //        del()
+        //        load()
+        //    }).fail(function () {
+        //        alert('請先登入會員')
+        //    })
+
+        //})
+        //刪除留言
+        function dd() {
+            let id = event.target.id
+            $.ajax({
+                url: 'https://localhost:44333/ProductInfo/GetDelete'+"/"+id,
+                type:'DELETE'
+            }).done(function () {
+                alert("刪除成功")
+                load()
+            })
+        }
+
+        //清空qi
+        $("#del").click(function () {
+
+        })
+
+    $('#al').click(function (e) {
+        e.preventDefault()
+    })
+
+        function del() {
+            $('textarea').val("")
+        }
+
+    $('#nb').blur(Check_Count)
+
+        $('#buttons>button').click(function () {
+            let count = Set_Count($(this).index())
+            if (count != 0 && count != null) {
+                $('#price').text('$' + Set_Price($(this).index()))
+
+                if ($(this).index() != 0 && $('#VIPprice').length == 1) 
+                    $('#price').css('text-decoration', '')
+
+                if ($(this).index() == 0 && $('#VIPprice').length == 1) 
+                    $('#price').css('text-decoration', 'line-through')
+                
+                $('#VIPprice').attr('hidden', $(this).index() != 0)
+                $('#adjustDiv').attr('hidden', false)
+                $('#nb').val(1)
+                $('#nb').attr('max', Set_Count($(this).index()))
+                $('#count').text(`庫存 ${Set_Count($(this).index())} 件`)
+                $('input[name="id"]').val(Set_ID($(this).index()))
+                $('#nb').prop('disabled', false)
+                $('#al').addClass('wide-btn')
+                $('#al').removeClass('btn-secondary')
+                $('#labOutStock').attr('hidden', true)
+        }
+
+            else {
+                let price = Set_Price($(this).index())
+                console.log(price)
+                $('#price').text(price !== undefined ? '$' + price : '')
+
+                if ($(this).index() != 0 && $('#VIPprice').length == 1)
+                    $('#price').css('text-decoration', '')
+
+                if ($(this).index() == 0 && $('#VIPprice').length == 1)
+                    $('#price').css('text-decoration', 'line-through')
+
+                $('#VIPprice').attr('hidden', $(this).index() != 0)
+
+                $('#count').text(`庫存 ${0} 件`)
+
+                $('#labOutStock').attr('hidden',false)
+                $('#nb').prop('disabled', true)
+                $('#al').removeClass('wide-btn')
+                $('#al').addClass('btn-secondary')
+        }
+        $(this).addClass('button_clicked')
+        $(this).siblings().removeClass('button_clicked')
+        $(this).siblings().addClass('button')
+    })
+
+        $('#al').click(function () {
+            if ($('#nb').is(':disabled')) return;
+
+        document.theForm.submit()
+    })
+
+    let ProductCount = Check_CountisNull()
+
+    if (ProductCount === undefined || ProductCount == 0) {
+
+        //$('#price').text('缺貨中')
+        let price = Set_Price(0)
+        $('#price').text(price !== undefined ? '$' + price : '')
+        $('#labOutStock').attr('hidden', false)
+        $('#nb').prop('disabled', true)
+        $('#al').removeClass('wide-btn')
+        $('#al').addClass('btn-secondary')
+
+    }
+
+    function Check_CountisNull() {
+        return @Model.NormalCount
+    }
+
+    function Check_Count() {
+            let nb = Number($(this).val())
+            let max = Number($(this).attr('max'))
+            let min = Number($(this).attr('min'))
+
+            if (nb > max)
+                $(this).val(max)
+
+            if (nb < min)
+                $(this).val(min)
+    }
+
+    function Set_Price(ButtonIndex) {
+        switch (ButtonIndex) {
+            case 0: return @Model.NormalPrice;
+            case 1: return @Model.SpotPrice;
+            case 2: return @Model.SpecialOfferPrice;
+        }
+    }
+
+    function Set_Count(ButtonIndex) {
+        switch (ButtonIndex) {
+            case 0: return @Model.NormalCount;
+            case 1: return @Model.SpotCount;
+            case 2: return @Model.SpecialOfferCount;
+        }
+    }
+
+    function Set_ID(ButtonIndex) {
+        switch (ButtonIndex) {
+            case 0: return @Model.NormalSalesInfoId;
+            case 1: return @Model.SpotSalesInfoId;
+            case 2: return @Model.SpecialOfferSalesInfoId;
+        }
+    }
+
+    const url = "https://localhost:44333/api/APIHome"
+
+    //頁面載入後設置追蹤商品
+    $.ajax({
+        type: 'GET',
+        url: url + '/GetCollects',
+    }).done((datas) => {
+        $.each(datas, (index, data) => {
+            if (data.collectTypeIdFk == 2) {
+                $(`input[name="PID${data.productIdFk}"]`).siblings('i').toggleClass('bi-megaphone bi-megaphone-fill')
+                $(`input[name="PID${data.productIdFk}"]`).siblings('label').attr('hidden', false)
+            }
+        })
+    })
+
+    //追蹤icon點擊時
+    $('i.bi-megaphone,i.bi-megaphone-fill').click(function () {
+        $(this).toggleClass('bi-megaphone bi-megaphone-fill')
+        //設置文字顯示，如果點擊icon樣式是bi-megaphone(未追蹤)則隱藏，反之則顯示
+        $(this).siblings('label').attr('hidden', $(this).attr('class') == 'bi-megaphone' ? true : false)
+        Tracking_Click($(this).siblings('input').val())
+    })
+
+    //點擊追蹤icon
+    function Tracking_Click(ProductID) {
+        $.ajax({
+            type: 'POST',
+            url: url + '/Tracking',
+            contentType: 'application/json',
+            data: ProductID,
+        })
+    }
+
+</script>
+}

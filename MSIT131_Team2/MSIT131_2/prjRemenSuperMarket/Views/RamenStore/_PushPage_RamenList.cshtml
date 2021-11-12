@@ -1,0 +1,45 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CRamenAdd>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>編號</th>
+                <th>@Html.DisplayNameFor(model => model.ProductName)</th>
+                <th>@Html.DisplayNameFor(model => model.ProductPictureByte)</th>
+                <th>@Html.DisplayNameFor(model => model.Price)</th>
+                <th>編輯</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int count = 0;
+                @foreach (var item in Model)
+                {
+                    count++;
+                    <tr>
+                        <td>@count</td>
+                        <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                        <td><img src="data:image/jpeg;base64,@item.ProductPictureBase64" width="100" height="100" /></td>
+                        <td>@Html.DisplayFor(modelItem => item.Price)</td>
+
+                        <td>
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal" name="RamenEditBtn">編輯</button>
+                        </td>
+                        <td hidden="hidden">@item.RamenProductId</td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+
+    @if (count == 0)
+    {
+        <h2 style="text-align: center">尚未新增商品</h2>
+    }
+
+</div>
+
+<script>
+    $('button[name="RamenEditBtn"]').click(Load_RamenEdit_Page)
+</script>

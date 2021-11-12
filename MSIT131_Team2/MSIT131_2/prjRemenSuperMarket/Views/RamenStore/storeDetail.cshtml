@@ -1,0 +1,131 @@
+﻿@model prjRemenSuperMarket.ViewModel.CRamenStore
+
+<section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="background-image: url(data:image/jpeg;base64,@Model.PictrueBase64);">
+    <h2 class="tit6 t-center" style="color:burlywood;font-size:600%">
+    </h2>
+</section>
+
+
+
+
+<div class="form-row">
+    <div class="col-2">
+
+    </div>
+    <div class="col-8">
+        <p style="color:brown;font-size:400%;text-align:center">@Model.StoreName</p>
+    </div>
+
+    @if (ViewBag.IsLogin == true)
+    {
+        <div class="col-2">
+            <span style="float:right">
+                <input id="StoreID" value="@Model.RamenStoreId" hidden="hidden" />
+                <button type="button" class="btn btn-info " style="font-size:120%" id="AddFavorite">
+                    加入至收藏
+                    <i class="bi-star me-1 fa-lg favorite"></i>
+                </button>
+            </span>
+        </div>
+    }
+
+</div>
+
+<p style="color:brown;font-size:200%;text-align:center">Menu</p>
+<section class="section-mainmenu p-t-110 p-b-70 bg1-pattern">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-lg-6 p-r-35 p-r-15-lg m-l-r-auto">
+                <div class="wrap-item-mainmenu p-b-22" id="menu">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<p style="color:brown;font-size:400%;text-align:center">店家介紹</p>
+<section class="section-mainmenu p-t-110 p-b-70 bg1-pattern">
+    <div class="form-group" style="margin-left:40px;margin-right:40px">@Model.Introduce</div>
+    <div class="form-group" style="margin-left:40px;margin-right:40px">
+        <label class="control-label" style="width:100px">地址</label>
+        <label id="add">@Model.Address</label>
+
+    </div>
+    <div class="form-group" style="margin-left:40px;margin-right:40px">
+        <label class="control-label" style="width:100px">連絡電話</label>
+        <label>@Model.Phone</label>    
+    </div>
+    <iframe width="650"
+            height="450"
+            frameborder="0"
+            style="border:0"
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB6Mxh3KF6CSnVvF8OV2Q2Sja8N7wVoQ7o&q=@Model.CityName@Model.DistrictName@Model.Address"
+            allowfullscreen>
+    </iframe>
+</section>
+<input type="hidden" value="@Model.RamenStoreId" id="rsid" />
+<input type="hidden" value="@Model.CityId" id="cid" />
+<input type="hidden" value="@Model.DistrictId" id="did" />
+<input type="hidden" value="@Model.Address" id="adds" />
+
+@section Styles{ 
+    <style>
+        .favorite {
+            color: gold;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script>
+        getRamenDetail()
+        //getAddress()
+        async function getRamenDetail() {
+            const id = $('#rsid').val()
+            const Response = await fetch('/RamenStore/RamenDetail?id=' + id)
+            const datas = await Response.json()
+            datas.forEach((item) => {
+                const span = $('<span class="info-item-mainmenu txt23" style="font-size:20px"></span>').text(item.productName)
+                const div4 = $('<div class="price-item-mainmenu txt22"></div>').text("$" + item.price) //4
+                const div3 = $('<div class="line-item-mainmenu bg3-pattern"></div>') //3
+                const img = $(`<img src="data:image/jpeg;base64,${item.productPictureBase64}" style="width:200px"/>`)
+                const div2 = $('<div class="flex-w flex-b m-b-3"></div>') //2
+                const div1 = $('<div class="item-mainmenu m-b-36"></div>') //1
+                div2.append(img, div3, div4)
+                div1.append(div2, span)
+                $('#menu').append(div1)
+            })
+        }
+
+
+        //收藏icon點擊時
+        $('#AddFavorite').click(function () {
+            $('.favorite').toggleClass('bi-star bi-star-fill') //切換樣式
+            Favorite_Click($(this).siblings('input').val());
+        })
+
+        const url = "https://localhost:44333/api/RamenStoreCollect"
+
+        //頁面載入後設置收藏商品
+        $.ajax({
+            type: 'GET',
+            url: url + '/GetCollects',
+        }).done((datas) => {
+            $.each(datas, (index, data) => {
+                if ($('#StoreID').val() == data.storeId) {
+                    $('.favorite').toggleClass('bi-star bi-star-fill')
+                }
+            })
+        })
+
+        //點擊收藏icon
+        function Favorite_Click(StoreID) {
+            $.ajax({
+                type: 'POST',
+                url: url + '/Add_Favorite',
+                contentType: 'application/json',
+                data: StoreID,
+            })
+        }
+    </script>
+}

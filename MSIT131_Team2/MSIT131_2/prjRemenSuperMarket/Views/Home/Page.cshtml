@@ -1,0 +1,383 @@
+﻿@{
+    ViewData["Title"] = "拉麵首頁";
+}
+
+@section Styles{
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        #categoryDetailList {
+            width: 200px;
+            vertical-align: top;
+        }
+
+        .sel_CategoryDetail {
+            background-color: #006000;
+        }
+
+        .sel_CategoryDetail > button {
+            margin: 10px;
+            color: #F0F0F0;
+        }
+
+        #CategoryList, #Fliter {
+            margin: 0 auto;
+        }
+
+        #CategoryList > button {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+    </style>
+}
+
+<body class="animsition">
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/HomePage.jpg);">
+        <h2 class="tit6 t-center">
+            商城-食材
+        </h2>
+    </section>
+
+    <section class="section-SaleInfo bg1-pattern p-t-35 p-b-35">
+        <div class="container">
+            <div class="form-row col-5" style="margin-bottom:20px">
+                <div class="col-10">
+                    <input id="KeyWord" type="text" list="Answers" placeholder="輸入產品名稱..." class="form-control border-dark" style="background-color:antiquewhite" />
+                    <datalist id="Answers"></datalist>
+                </div>
+
+                <div class="col-2">
+                    <button id="KeyWordSearch" class="btn" style="background-color:lightgray">
+                        <i class="fa fa-search fa-lg"></i>
+                        找食材
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom:30px">
+                <div id="CategoryList">
+
+                </div>
+            </div>
+
+            <div class="col-md-2 mt-5">
+                <i id="listRefresh" class="fa fa-refresh"></i>
+            </div>
+
+            <hr style="height:2px" />
+
+            <div id="Fliter">
+                <div class="btn btn-warning">
+                    <input type="checkbox" id="spotselecter" />
+                    <label style="margin:0">即期品</label>
+                </div>
+                <div class="btn btn-warning">
+                    <input type="checkbox" id="spselecter" />
+                    <label style="margin:0">特價品</label>
+                </div>
+                <div class="btn btn-warning" id="collect">
+                    <input type="checkbox" id="ShowCollect" />
+                    <label style="margin:0">我的收藏</label>
+                </div>
+            </div>
+            
+            <table>
+                <tbody>
+                    <tr>
+                        <td id="categoryDetailList">
+                        </td>
+
+                        <td style="vertical-align: top">
+                            <div id="DivList" style="width:1000px;min-height:500px"></div>
+
+                            <div class="flex-c-m flex-w p-l-15 p-r-15 m-t-24 m-b-50" id="Page">
+                                <button class="item-pagination flex-c-m trans-0-4 active-pagination">1</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+</body>
+@section Scripts{
+    <script>
+
+        let CDID_Binary = null
+        let ShowCollect = false
+        let Page_Click = false
+        let spot = false
+        let special = false
+
+        Load_Category_Button() //載入種類按鈕
+        Get_Login_User()
+
+        $('#DivList').load('/Home/Index') //載入商品頁面
+
+        $('#listRefresh').click(function () {
+            Search_Product()
+        })
+
+        //只顯示收藏點擊時
+        $('#ShowCollect').click(function () {
+            Clear_Page()
+            ShowCollect = $(this).is(':checked')
+            Search_Product()
+        })
+
+        async function Load_Category_Button() {
+            const response = await fetch('/SelectorList/All_Category')
+            const datas = await response.json()
+
+            $.each(datas, (index, item) => {
+                //建立一個按鈕元素
+                $('<button/>').text(item.name) //設置內容
+                    .attr('name', 'categoryBtn') //設置name屬性
+                    .data('CategoryID', item.id) //設置自訂屬性儲存CategoryID
+                    .addClass(index != 0 ? 'btn btn-success' : 'btn btn-success btn-warning') //設置樣式
+                    .click(Load_CategoryDetail_Filter)
+                    .appendTo($('#CategoryList')) //加入至Div
+            })
+        }
+
+        async function Load_CategoryDetail_Filter() {
+            //切換種類按鈕btn-warning樣式
+            $(this).toggleClass('btn-warning')
+
+            //如果點擊是種類按鈕"全部"
+            if ($(this).text() == '全部') {
+                $('#categoryDetailList').empty(); //清空所有細項篩選條件
+                $(this).siblings().removeClass('btn-warning') //移除其他種類按鈕的btn-warning樣式
+                Search_Product() //搜尋產品
+                return; //跳過以下
+            }
+
+            //將"全部"按鈕的btn-warning樣式移除
+            $('#CategoryList>button:first-child').removeClass('btn-warning')
+            //將細項篩選的有摺疊樣式的元素(div)移除展開(show)樣式
+            $('#categoryDetailList').find('.collapse').removeClass('show')
+
+            let Category = $(this).text()
+            let CategoryID = $(this).data('CategoryID') //從按鈕中取得自訂屬性CategoryID
+
+            //如果按鈕點擊後具有btn-warning樣式
+            if ($(this).hasClass('btn-warning')) {
+                const Div = $('<div/>').attr('id', 'CID' + CategoryID)              
+                const chk = $('<input/>').attr('type', 'checkbox').prop('checked', true).click(Filter_Category_CheckBox_Click)
+                const btn = $('<button/>').text(Category).click(Filter_Category_Button_Click)
+                const ul_Div = $('<div/>').addClass('collapse show')
+                const ul = $('<ul/>')
+
+                const response = await fetch('/SelectorList/CategoryDetails?CategoryID=' + CategoryID)
+                const datas = await response.json()
+
+                datas.forEach((item) => {
+                    //建立一個li元素
+                    
+                    const li = $('<li/>').data('CDID', item.id) //設置自訂屬性CategoryDetailsID
+
+                    $('<input/>').attr('type', 'checkbox')
+                        .prop('checked', true)
+                        .click(Filter_CategoryDetail_Click)
+                        .appendTo(li)
+                        
+
+                    //建立一個button元素
+                    $('<button/>').text(item.name)
+                        .click(Filter_CategoryDetail_Click)
+                        .appendTo(li)
+
+
+                    li.appendTo(ul)
+                })
+
+                ul.appendTo(ul_Div)
+                chk.appendTo(Div)
+                btn.appendTo(Div)
+                ul_Div.appendTo(Div)
+
+                //合併結果
+                //<div id="CID1">
+                //    <input type="checkbox">
+                //    <button>蔬菜</button>
+                //    <div class="collapse show">
+                //        <ul>
+                //            <li data-CDID="1">
+                //                <input type="checkbox">
+                //                <button>葉菜類</button>
+                //            </li>
+                //            <li data-CDID="2">
+                //              .....
+                //            </li>
+                //        </ul>
+                //    </div>
+                //</div>
+
+                Div.appendTo($('#categoryDetailList')) //加入至細項篩選Div
+            }
+
+            //如果按鈕點擊後，不具有btn-warning樣式
+            else {
+                //移除在細項篩選中的篩選器
+                $(`#CID${CategoryID}`).remove();
+
+                //檢查除"全部"按鈕以外，具有btn-warning樣式按鈕的數量
+                if ($('#CategoryList>button.btn-warning').length == 0)
+                    //如果數量為0，將"全部"按鈕加上btn-warning樣式
+                    $('#CategoryList>button:first-child').addClass('btn-warning')
+            }
+
+            Search_Product() //搜尋產品
+        }
+
+        //點擊篩選器的種類Checkbox時
+        function Filter_Category_CheckBox_Click() {
+            //如果checkbox點擊後已被勾選
+            if ($(this).is(':checked'))
+                //將該種類的所有細項全部勾選
+                $(this).siblings('div').find('[type="checkbox"]').prop('checked', true)
+
+            else
+                //將該種類的所有細項全部取消勾選
+                $(this).siblings('div').find('[type="checkbox"]').prop('checked', false)
+
+            Search_Product() //搜尋產品
+        }
+
+        //點擊篩選器的種類細項Checkbox或按鈕(文字)時
+        function Filter_CategoryDetail_Click() {
+            //如果是點擊按鈕
+            if ($(this).is('button')) {
+                //自動點擊細項checkbox
+                $(this).siblings('[type="checkbox"]').click()
+            }
+
+            //檢查已勾選的細項數量
+            if ($(this).parents('ul').find(':checked').length > 0)
+                //如果數量大於0，將最上層種類的checkbox勾選
+                $(this).parents('div').siblings('[type="checkbox"]').prop('checked', true)
+            else
+                //如果數量等於0，將最上層種類的checkbox取消勾選
+                $(this).parents('div').siblings('[type="checkbox"]').prop('checked', false)
+
+            Search_Product() //搜尋產品
+        }
+
+        //點擊篩選器種類按鈕(文字)時
+        function Filter_Category_Button_Click() {
+            //如果點擊時細項列表已被展開
+            if ($(this).siblings('div').hasClass('show'))
+                //將所有細項列表收起
+                $('#categoryDetailList').find('.collapse').removeClass('show')
+
+            else {
+                //將所有細項列表收起，再展開自己的細項列表
+                $('#categoryDetailList').find('.collapse').removeClass('show')
+                $(this).next().toggleClass('show')
+            }
+        }
+
+        //搜尋產品
+        async function Search_Product(SkipCount = null) {
+            //如果按鈕"全部"具有btn-warning樣式
+            if ($('#CategoryList>button:first-child').hasClass('btn-warning'))
+                CDID_Binary = null //細項旗標值設為null(表示搜尋全部)
+
+            else {
+                CDID_Binary = 0
+                //取得每個勾選的細項
+                $.each($('#categoryDetailList').find('li>:checked'), (index, ele) => {
+                    //計算細項旗標值
+                    CDID_Binary += Math.pow(2, $(ele).parents('li').data('CDID'))
+                })
+
+                console.log(CDID_Binary)
+            }
+
+            if (!Page_Click)
+                Clear_Page() //清除分頁按鈕
+
+            let KeyWord = $('#KeyWord').val()
+
+            //載入產品頁面
+            $('#DivList').load(`/Home/Index?CDID_Binary=${CDID_Binary}&Skip=${SkipCount}&ShowCollect=${ShowCollect}&KeyWord=${KeyWord}&spot=${spot}&special=${special}`)
+        }
+
+        //清除分頁按鈕
+        function Clear_Page() {
+            //保留第一個，並設置屬性
+            $('#Page>button').first().addClass('active-pagination')
+            $('#Page>button').first().siblings().remove()
+        }
+
+        //分頁按鈕點擊時
+        function Skip_Load_Product() {
+            $(this).addClass('active-pagination')
+            $(this).siblings('button').removeClass('active-pagination')
+
+            let SkipCount = ($(this).text() - 1) * 9;
+
+            Page_Click = true
+            Search_Product(SkipCount)
+
+            Page_Click = false
+        }
+
+        //登入後才顯示"篩選收藏"
+        async function Get_Login_User() {
+            const response = await fetch('/Member/Get_Login_User')
+            const datas = await response.json()
+            if (datas.name == null) {
+                $('#collect').hide()
+            } else {
+                $('#collect').show()
+            }
+        }
+
+        $('#KeyWord').on('compositionend', Use_KeyWord_Find_ProductName)
+        $('#KeyWordSearch').click(() => {
+            $('#categoryDetailList').empty(); //清空所有細項篩選條件
+            $('button[name=categoryBtn]:first-child').addClass('btn-warning').siblings().removeClass('btn-warning')
+            Search_Product()
+        })
+
+        let SearchCoolDown = false
+
+        async function Use_KeyWord_Find_ProductName() {
+            if (SearchCoolDown) return;
+
+            SearchCoolDown = true
+
+            $('#Answers').empty()
+
+            if ($('#KeyWord').val() == '') {
+                SearchCoolDown = false
+                return;
+            }
+
+            const response = await fetch('/Home/Use_KeyWord_Find_ProductName?KeyWord=' + $('#KeyWord').val())
+            const datas = await response.json()
+
+            await $.each(datas, (index, data) => {
+                $('<option/>').data('CDID', data.id).text(data.name).appendTo($('#Answers'))
+            })
+
+            SearchCoolDown = false
+        }
+
+        $('#spotselecter,#spselecter').click(async function () {
+            Clear_Page()
+            spot = $('#spotselecter').is(':checked')
+            special = $('#spselecter').is(':checked')
+
+            Search_Product()
+        })
+        
+
+    </script>
+}

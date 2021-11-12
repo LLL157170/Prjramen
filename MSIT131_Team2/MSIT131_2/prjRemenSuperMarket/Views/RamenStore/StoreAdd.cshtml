@@ -1,0 +1,100 @@
+﻿@model prjRemenSuperMarket.ViewModel.CStoreAdd
+
+@{
+    ViewData["Title"] = "StoreAdd";
+}
+<div style="height:160px"></div>
+<h1>StoreAdd</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="StoreAdd" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="StoreName" class="control-label"></label>
+                <input asp-for="StoreName" class="form-control" />
+                <span asp-validation-for="StoreName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Introduce" class="control-label"></label>
+                <input asp-for="Introduce" class="form-control" />
+                <span asp-validation-for="Introduce" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CityId" class="control-label"></label>
+                <select id="seleCity" asp-for="CityId" class="form-control"></select>
+                <span asp-validation-for="CityId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DistrictId" class="control-label"></label>
+                <select id="seleDist" asp-for="DistrictId" class="form-control"></select>
+                <span asp-validation-for="DistrictId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Logo" class="control-label">推廣照放此</label>
+                <input type="file" asp-for="Logo" class="form-control" />
+                <span asp-validation-for="Logo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let seleCity = document.querySelector('#seleCity')
+        let seleDist = document.querySelector('#seleDist')
+
+        //city change
+        seleCity.addEventListener('change', function () {
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        })
+
+        Load_City()
+        //add citylist
+        async function Load_City() {
+            const response = await fetch('/Member/City')
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.cityName, item.cityIdPk)
+                seleCity.options.add(opt)
+            })
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        }
+
+        // citylist
+        async function Load_District() {
+            const response = await fetch('/Member/District?id=' + seleCity.value)
+            const datas = await response.json()
+            while (seleDist.length > 0) {
+                seleDist.remove(seleDist.length - 1)
+            }
+            datas.forEach((item) => {
+                const opt = new Option(item.districtName, item.districtIdPk)
+                seleDist.options.add(opt)
+            })
+        }
+    </script>
+}

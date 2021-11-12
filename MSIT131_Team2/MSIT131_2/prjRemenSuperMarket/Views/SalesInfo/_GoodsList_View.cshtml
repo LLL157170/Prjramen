@@ -1,0 +1,102 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CGoods>
+
+<h3 name="sysText" style="color:red">(系統選定)</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>選擇</th>
+            <th>編號</th>
+            <th>@Html.DisplayNameFor(model => model.ProductName)</th>
+            <th>@Html.DisplayNameFor(model => model.EmployeeName)</th>
+            <th>@Html.DisplayNameFor(model => model.MerchantName)</th>
+            <th>@Html.DisplayNameFor(model => model.Counts)</th>
+            <th>@Html.DisplayNameFor(model => model.PurchaseCost)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_PurchaseDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_ShelfLife)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_LaunchDate)</th>
+            <th>@Html.DisplayNameFor(model => model.ProductStatus)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count = 0;
+            foreach (var item in Model)
+            {
+                count++;
+                <tr>
+                    <td><input type="checkbox" name="check" value="@count"/></td>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MerchantName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Counts)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PurchaseCost)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_PurchaseDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_ShelfLife)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_LaunchDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductStatus)</td>
+                    <td hidden="hidden">@Html.DisplayFor(modelItem => item.GoodsIdPk)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@{
+    if (count == 0)
+    {
+        <h2 style="color:red; text-align:center"> 目前貨物沒有該產品</h2>
+    }
+}
+
+<script>
+    {
+        IsCreate ? Create_AutoCheck() : Edit_AutoCheck()
+        $('input[name="check"]').attr('hidden', IsSystemLock)
+        $('*[name="sysText"]').attr('hidden', !IsSystemLock)
+
+        function Create_AutoCheck() {
+            let AutoCheckBox = $('input[name="check"]').first()
+
+            AutoCheckBox.prop('checked', true)
+            AutoCheckBox.parents('tr').addClass('table-danger')
+
+            Get_Check_Goods_Info_ByCreate()
+        }
+
+        function Edit_AutoCheck() {
+            let AutoCheckBox
+            let CheckBoxes = $('input[name="check"]').parents('tr')
+
+            $.each(CheckBoxes, function (index, val) {
+                if ($(val).find('td:last-child').text() == $('#InputGoodsId').val())
+                    AutoCheckBox = $(val).find('input[name="check"]')
+            })
+
+            if (AutoCheckBox != null) {
+                AutoCheckBox.prop('checked', true)
+                AutoCheckBox.parents('tr').addClass('table-danger')
+            }
+
+            Get_Check_Goods_Info_ByEdit()
+        }
+
+        //設置checkBox點擊事件
+        $('input[name="check"]').click(function () {
+            let thisCheckBox = $(this)
+
+            //標記點擊的CheckBox的整列資料
+            //移除其他CheckBox的標記及選擇
+            if (thisCheckBox.is(':checked')) {
+                thisCheckBox.parents('tr').addClass('table-danger')
+                thisCheckBox.parents('tr').siblings().removeClass('table-danger')
+                thisCheckBox.parents('tr').siblings().find('input[name="check"]').prop('checked', false)
+            }
+            else
+                thisCheckBox.parents('tr').removeClass('table-danger')
+
+            IsCreate ? Get_Check_Goods_Info_ByCreate() : Get_Check_Goods_Info_ByEdit()
+        })
+    }
+</script>

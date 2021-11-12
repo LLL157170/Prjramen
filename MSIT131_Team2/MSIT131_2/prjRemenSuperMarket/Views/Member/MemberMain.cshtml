@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewData["Title"] = "MemberMain";
+}
+<style>
+    #member01, #member02, #member03 {
+        color: white;
+        background-color: #ef8c03;
+    }
+
+        #member01, #member02, #member03:hover {
+            background-color: #ffa121;
+        }
+</style>
+<body class="animsition">
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/member.jpg);">
+        <h2 class="tit6 t-center font-weight-bold">
+            <a class="display-4">會員中心</a>
+        </h2>
+    </section>
+
+    <form>
+        <section class="section-SaleInfo bg2-pattern p-t-30 p-b-30">
+            <div class="container">
+                <div>
+                    <label style="font-size: 30px; font-weight: 700; color: chocolate; margin-left: 20px;">
+                        歡迎~ @ViewBag.username
+                    </label>
+                </div>
+            </div>
+        </section>
+
+
+        <section class=" bg2-pattern p-b-30">
+            <div class="container">
+
+                <div class="social-cust-dropdown ">
+                    <div class="flex-w flex-l-m m-l-r-auto flex-col-c-sm p-l-0 p-r-0">
+                        <div class="btn-group">
+                            <a class="btn btn-white dropdown-toggle m-r-20" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="member01">
+                                會員資料
+                            </a>
+                            <div class="social-cust-dropdown">
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="~/Member/MemberEdit/@ViewBag.kk">個人資料</a>
+                                    <a class="dropdown-item" href="~/Member/PasswordEditCheck/@ViewBag.kk">修改密碼</a>
+                                    @*<div class="dropdown-divider"></div>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <a class="btn btn-white dropdown-toggle m-r-20" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="member02">
+                                訂單查詢
+                            </a>
+                            <div class="social-cust-dropdown">
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="~/Member/order/@ViewBag.kk">我的訂單</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <a class="btn btn-white dropdown-toggle m-r-20" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="member03">
+                                收藏名單
+                            </a>
+                            <div class="social-cust-dropdown">
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="~/Member/collect/@ViewBag.kk">食材收藏</a>
+                                    <a class="dropdown-item" href="#">拉麵收藏</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+
+        @*<div>
+                <fieldset style="width: 500px; margin: 15px; border: 2px solid blue; border-radius: 20px;">
+                    <label class="display-6">會員服務</label>
+                    <div>
+                        <ul>
+                            <li>@Html.ActionLink("修改", "MemberEdit", new { id = ViewBag.kk })</li>
+                            <li>@Html.ActionLink("訂單查詢", "order", new { id = ViewBag.kk })</li>
+                            <li>@Html.ActionLink("收藏名單", "collect", new { id = ViewBag.kk })</li>
+                            <li>@Html.ActionLink("修改密碼", "PasswordEditCheck", new { id = ViewBag.kk })</li>
+                            <li>@Html.ActionLink("修改地址", "AddressEdit", new { id = ViewBag.kk })</li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>*@
+
+
+    </form>
+</body>
+

@@ -1,0 +1,84 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CRamenStore>
+
+<body class="animsition">
+    <!-- Title Page -->
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="background-image: url(/images/galaview.jpg);">
+        <h2 class="tit6 t-center">
+            推廣-拉麵店
+        </h2>
+    </section>
+    <section class="section-RamenStore p-t-77 p-b-0">
+        <div class="content-intro bg-white p-t-0 p-b-0">
+            <div class="container">
+                <div class="wrap-label-gallery filter-tope-group size27 flex-w flex-sb-m m-l-r-auto flex-col-c-sm p-l-15 p-r-15 m-b-60">
+                    <button class="label-gallery txt26 trans-0-4 is-actived" data-filter="*">
+                        所有商家
+                    </button>
+
+                    <button class="label-gallery txt26 trans-0-4" data-filter=".北區">
+                        北區
+                    </button>
+
+                    <button class="label-gallery txt26 trans-0-4" data-filter=".中區">
+                        中區
+                    </button>
+
+                    <button class="label-gallery txt26 trans-0-4" data-filter=".南區">
+                        南區
+                    </button>
+
+                    <button class="label-gallery txt26 trans-0-4" data-filter=".東區">
+                        東區
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-reservation bg1-pattern p-t-55 p-b-113">
+        <div class="container">
+            <!-- Gallery -->
+            <div class="section-gallery p-t-0 p-b-100">
+                <div class="wrap-gallery isotope-grid flex-w p-l-25 p-r-25" id="pch">
+                    <!-- - -->
+                    @foreach (var item in Model)
+                    {
+                        <div class="item-gallery isotope-item bo-rad-10 hov-img-zoom" id="@item.CityId">
+                            <a href="~/RamenStore/storeDetail?id=@item.RamenStoreId"><img src="data:image/jpeg;base64,@item.LogoBase64" alt="圖片遺失"/></a>
+                        </div>
+                    }
+                </div>
+
+                <div class="pagination flex-c-m flex-w p-l-15 p-r-15 m-t-24 m-b-50">
+                    <a href="#" class="item-pagination flex-c-m trans-0-4 active-pagination">1</a>
+                    <a href="#" class="item-pagination flex-c-m trans-0-4">2</a>
+                    <a href="#" class="item-pagination flex-c-m trans-0-4">3</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+@section Scripts
+{
+    <script>
+        $('#pch>div').nextAll("#1").addClass('北區')
+        $('#pch>div').nextAll("#2").addClass('北區')
+        $('#pch>div').nextAll("#3").addClass('北區')
+        $('#pch>div').nextAll("#4").addClass('北區')
+        $('#pch>div').nextAll("#5").addClass('北區')
+        $('#pch>div').nextAll("#6").addClass('北區')
+        $('#pch>div').nextAll("#7").addClass('北區')
+        $('#pch>div').nextAll("#8").addClass('中區')
+        $('#pch>div').nextAll("#9").addClass('中區')
+        $('#pch>div').nextAll("#10").addClass('中區')
+        $('#pch>div').nextAll("#11").addClass('中區')
+        $('#pch>div').nextAll("#12").addClass('南區')
+        $('#pch>div').nextAll("#13").addClass('南區')
+        $('#pch>div').nextAll("#14").addClass('南區')
+        $('#pch>div').nextAll("#15").addClass('南區')
+        $('#pch>div').nextAll("#16").addClass('南區')
+        $('#pch>div').nextAll("#17").addClass('北區')
+        $('#pch>div').nextAll("#18").addClass('東區')
+        $('#pch>div').nextAll("#19").addClass('東區')
+    </script>
+}

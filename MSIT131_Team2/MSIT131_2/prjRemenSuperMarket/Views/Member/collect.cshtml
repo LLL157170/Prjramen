@@ -1,0 +1,50 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CCollectViewModel>
+
+@{
+    ViewData["Title"] = "收藏名單";
+}
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/productcollect.jpg);">
+        <h2 class="tit6 t-center">
+            食材收藏
+        </h2>
+    </section>
+    <section class="product-details bg2-pattern p-t-55 p-b-113">
+        <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>
+
+                        <th>
+                            @Html.DisplayNameFor(model => model.Product)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.PictureBase64)
+                        </th>                        
+                        <th></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Product)
+                            </td>
+                            <th>
+                                <img class="card-img-top" src="data:image/jpeg;base64,@item.PictureBase64" style="width:100px" />
+                            </th>                            
+                            <td>
+                                @Html.ActionLink("檢視", "Detail", "ProductInfo", new { id = item.ProductInfoIFk }, new { @class = "btn btn-success" })
+                                @Html.ActionLink("刪除", "DeleteCollect", "Member", new { id = item.CollectIdPk }, new { @class = "btn btn-danger" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>

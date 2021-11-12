@@ -1,0 +1,259 @@
+﻿@{
+    ViewData["Title"] = "List";
+}
+<link rel="stylesheet" href="~/css/site.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/employee.jpg);">
+        <h2 class="tit6 t-center">
+            會員資料表
+        </h2>
+    </section>
+    <section class="p-t-10" style="        background-color: #ebebeb;">
+        <div class="container">
+            <p style="margin-top:16px;margin-bottom:16px;">
+                <span style="margin:10px">關鍵字</span><input id="val" type="text" name="txtQuery" hint="輸入資料查詢" value="@ViewBag.keyword" style="background-color:antiquewhite" />
+                <button id="but" type="button" class="btn btn-info">查詢</button>
+            </p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="display:none">
+                            區號隱藏
+                        </th>
+                        <th style="display:none">
+                            編號
+                        </th>
+                        <th>
+                            序
+                        </th>
+                        <th>
+                            姓名
+                        </th>
+                        <th>
+                            電話
+                        </th>
+                        <th>
+                            區號
+                        </th>
+                        <th>
+                            地址
+                        </th>
+                        <th>
+                            電子郵件
+                        </th>
+                        <th>
+                            密碼
+                        </th>
+                        <th>
+                            生日
+                        </th>
+                        <th>
+                            編輯
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addForm">
+                                <input type="hidden" name="ttdd" id="ttdd" />
+                                <input type="hidden" name="memberIdPk" id="memberIdPk">
+                                <div class="form-group">
+                                    <label for="name">姓名</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           placeholder="姓名">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">電話</label>
+                                    <input type="text" class="form-control" id="phone" name="phone"
+                                           placeholder="電話">
+                                </div>
+                                <div class="form-group">
+                                    <label for="districtIdFk">區號</label>
+                                    <select id="sel">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">地址</label>
+                                    <input type="text" class="form-control" id="address" name="address" placeholder="地址">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eMail">電子郵件</label>
+                                    <input type="text" class="form-control" id="eMail" name="eMail" placeholder="電子郵件">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">密碼</label>
+                                    <input type="text" class="form-control" id="password" name="password" placeholder="密碼">
+                                </div>
+                                <div class="form-group">
+                                    <label for="birthday">生日</label>
+                                    <input type="date" class="form-control" id="birthday" name="birthday" placeholder="生日">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearData">關閉</button>
+                            <button type="button" class="btn btn-primary" id="sub">送出</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+@section Scripts{
+    <script>
+
+        const url = "https://localhost:44333/api/Members"
+        load()
+        looad()
+        const s = document.getElementById('sel')
+        async function looad() {
+            const response = await fetch('/RamenStore/District')
+            const data = await response.json()
+            $.each(data, function (idx, item) {
+                const opt = new Option(item.districtName, item.districtIdPk)
+                $('#sel').append(opt)
+            })
+        }
+
+        function load() {
+            $.getJSON(url, function (datas) {
+                let docFrag = $(document.createDocumentFragment())
+                $.each(datas, function (idx, item) {
+                    const cell0 = $('<td style="display:none"/>').text(item.districtIdFk)
+                    const cell1 = $('<td style="display:none"/>').text(item.memberIdPk)
+                    const cell2 = $('<td/>').text(idx + 1)
+                    const cell3 = $('<td/>').text(item.name)
+                    const cell4 = $('<td/>').text(item.phone)
+                    const cell5 = $('<td/>').text(item.district)
+                    const cell6 = $('<td/>').text(item.address)
+                    const cell7 = $('<td/>').text(item.eMail)
+                    const cell8 = $('<td/>').text(item.password)
+                    const bb = item.textBirthday.split('/')
+                    const kk = bb[0] + "-" + Appendzero(bb[1]) + "-" + Appendzero(bb[2])
+                    const cell9 = $('<td/>').text(kk)
+
+                    const cell10 = $('<td/>').html('<button Class = "btn btn-success" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">修改</button>  <button name="dle" class="btn btn-danger">刪除</button>')
+                    const row = $('<tr/>').append([cell0, cell1, cell2, cell3, cell4, cell5, cell6, cell7, cell8, cell9, cell10])
+                    docFrag.append(row)
+                })
+                $('tbody').html(docFrag)
+            })
+        }
+
+        /*查詢*/
+        $('#but').click(function index() {
+            const t = $('#val').val()
+
+            $.ajax({
+                url: url + "/" + t,
+                type: 'GET'
+            }).done(function (datas) {
+                let docFrag = $(document.createDocumentFragment())
+                $.each(datas, function (idx, item) {
+                    const cell0 = $('<td style="display:none"></td>').text(item.districtIdFk)
+                    const cell1 = $('<td style="display:none"></td>').text(item.memberIdPk)
+                    const cell2 = $('<td></td>').text(idx + 1)
+                    const cell3 = $('<td></td>').text(item.name)
+                    const cell4 = $('<td></td>').text(item.phone)
+                    const cell5 = $('<td></td>').text(item.district)
+                    const cell6 = $('<td></td>').text(item.address)
+                    const cell7 = $('<td></td>').text(item.eMail)
+                    const cell8 = $('<td></td>').text(item.password)
+                    const bb = item.textBirthday.split('/')
+                    const kk = bb[0] + "-" + Appendzero(bb[1]) + "-" + Appendzero(bb[2])
+                    const cell9 = $('<td></td>').text(kk)
+                    const cell10 = $('<td></td>').html('<button Class = "btn btn-success" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">修改</button>  <button name="dle" class="btn btn-danger">刪除</button>')
+                    const row = $('<tr></tr>').append([cell0, cell1, cell2, cell3, cell4, cell5, cell6, cell7, cell8, cell9, cell10])
+                    docFrag.append(row)
+                })
+                $('tbody').html(docFrag)
+            })
+        })
+
+
+
+        //修改
+        $('tbody').on('click', 'button:nth-child(1)', function () {
+            const row = $(this).parents('tr')
+            const fk = row.find('td:first-child').text()
+            const id = row.find('td:nth-child(2)').text()
+            const name = row.find('td:nth-child(4)').text()
+            const phone = row.find('td:nth-child(5)').text()
+            const districtIdFk = row.find('td:nth-child(6)').text()
+            const address = row.find('td:nth-child(7)').text()
+            const eMail = row.find('td:nth-child(8)').text()
+            const password = row.find('td:nth-child(9)').text()
+            const birthday = row.find('td:nth-child(10)').text()
+            $('#memberIdPk').val(id)
+            $('#name').val(name)
+            $('#phone').val(phone)
+            $('#sel').val(fk)
+            $('#address').val(address)
+            $('#eMail').val(eMail)
+            $('#password').val(password)
+            $('#birthday').val(birthday)
+
+        })
+
+        //修改
+        $('#sub').click(function () {
+            const id = $('#memberIdPk').val()
+            const jsonData = JSON.stringify({
+                memberIdPk: id, name: $('#name').val(), phone: $('#phone').val(),
+                districtIdFk: $('#sel').val(), address: $('#address').val(), eMail: $('#eMail').val(),
+                password: $('#password').val(), birthday: $('#birthday').val()
+            })
+            $.ajax({
+                url: url + '/' + id,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: jsonData
+            }).done(function (data) {
+                alert('修改成功，編號為 ' + id)
+                load()
+                clearData()
+            })
+            $('#addModal').modal('hide')
+        })
+
+        //刪除
+        $('tbody').on('click', 'button[name="dle"]', function () {
+            const id = $(this).parents('tr').find('td:nth-child(2)').text()
+            $.ajax({
+                url: url + "/" + id,
+                type: 'DELETE'
+            }).done(function () {
+                alert('刪除成功 編號為' + id)
+                load()
+            }).fail(function () {
+                alert('資料有訂單 請先刪除訂單')
+            })
+        })
+
+        function Appendzero(obj) {
+            if (obj < 10) return "0" + obj;
+            else return obj;
+        }
+
+        function clearData() {
+            $('input').val("")
+        }
+
+
+    </script>
+}

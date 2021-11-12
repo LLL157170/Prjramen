@@ -1,0 +1,63 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CRamenStoreCollect>
+
+@{
+    ViewData["Title"] = "拉麵店收藏";
+}
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/StoreCollect.jpg);">
+        <h2 class="tit6 t-center">
+            拉麵店收藏
+        </h2>
+    </section>
+    <section class="product-details bg2-pattern p-t-55 p-b-113">
+        <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>
+
+                        <th>
+                            @Html.DisplayNameFor(model => model.StoreName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.PictureBase64)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Address)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Phone)
+                        </th>
+
+                        <th></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StoreName)
+                        </td>
+                        <td>
+                            <img class="card-img-top" src="data:image/jpeg;base64,@item.PictureBase64" style="width:100px" />
+                        </td>
+                        <td>
+                            @item.City@item.District@item.Address
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Phone)
+                        </td>
+                        <td>
+                            @Html.ActionLink("檢視", "storeDetail", "RamenStore", new { id = item.StoreId }, new { @class = "btn btn-success" })                       
+                            @Html.ActionLink("刪除", "DeleteStoreCollect", "Member", new { id = item.StoreCollectId }, new { @class = "btn btn-danger" })
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>

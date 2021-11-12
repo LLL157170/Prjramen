@@ -1,0 +1,264 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CShoppingCart>
+
+
+@{
+    ViewData["Title"] = "PayIndex";
+
+}
+@section Styles{
+    <style>
+        /*#addressdiv {
+            padding: 4px,4px,4px,5px;
+        }*/
+
+        .bg-page {
+            width: 100%;
+            min-height: 50px; /*
+                    padding-left: 15px;
+                    padding-right: 15px;*/
+            background-color: #333333;
+            background-repeat: no-repeat;
+            background-position: center 0;
+            background-size: cover;
+        }
+
+        .tit11 {
+            font-family: Poppins;
+            font-weight: 700;
+            font-size: 20px;
+            line-height: 1.2;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            word-spacing: 6px;
+            margin-bottom: 0px;
+        }
+
+        .formCustDetail {
+            /* padding-left: 220px;
+            padding-right: 200px;
+            padding-bottom: 10px*/
+        }
+
+        .formCityBtn {
+            padding-left: 220px;
+            padding-right: 200px;
+            padding-bottom: 10px
+        }
+
+        .big-btn {
+            padding-left: 30px;
+            padding-right: 30px;
+            border-color: black;
+        }
+    </style>
+}
+
+<section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/Payment.jpg);">
+    <h2 class="tit6 t-center">
+        結帳頁面
+    </h2>
+</section>
+
+<section class="section-Payment bg2-pattern m-t-10 m-b-20">
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>序</th>
+                    <th>產品</th>
+                    <th>圖片</th>
+                    <th>原價</th>
+                    <th>購買數量</th>
+                    <th>小計</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int count = 0;
+                    decimal payment = 0;
+                    if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            count++;
+                            payment += item.小計;
+                            <tr>
+
+                                <td>
+                                    @count
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.productName)
+                                </td>
+                                <td>
+                                    <img class="card-img-top" src="data:image/jpeg;base64,@item.PictureBase64" style="width:100px" />
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.price)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.count)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.小計)
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="m-b-20 p-t-0 p-b-0" style="        color: #ec1d25">
+        <span style="font-size: 20px;font-weight: bold; padding-left:990px;text-decoration: underline;">
+            <label style="text-decoration: underline;">應付金額：</label>
+        </span>
+        <span style="        font-size: 20px;        font-weight: bold;text-decoration: underline;">
+            <label id="payment" style="text-decoration: underline;">
+                @payment
+            </label>
+        </span>
+    </div>
+
+    <form method="post" action="PaymentList">
+        <div class="row">
+            <div class="col-md-6">
+                <section class="bg-page flex-c-m p-t-0 p-b-0">
+                    <h2 class="tit11 t-center">
+                        訂購人資料
+                    </h2>
+                </section>
+                <div class="container" style="padding-top:1px;">
+                    <input type="hidden" name="OId" value="@ViewBag.txtId" />@*@Member.MemberIdPk*@
+                    <input type="hidden" name="OTotalPrice" value="@payment" />
+
+                    <div class="mb-3 formCustDetail">
+                        <label for="Name" class="form-label" style="font-size:24px;font-weight:700">姓名:</label>
+                        <input type="text" value=@ViewBag.txtName class="form-control" readonly="readonly" /> @*member.Name*@
+                    </div>
+
+                    <div class="mb-3 formCustDetail">
+                        <label for="Phone" class="form-label" style="font-size:24px;font-weight:700">手機號碼:</label>
+                        <input type="text" name="OPhone" value=@ViewBag.txtPhone class="form-control" readonly="readonly" /> @*member.Phone*@
+                    </div>
+
+                    <div class="mb-3 formCustDetail" id="addressdiv">
+                        <label for="address" class="form-label" style="font-size:24px;font-weight:700">地址:</label>
+                        <div class="row">
+                            <div class="col-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                <select id="seleCity" class="form-control t-center"></select>
+                            </div>
+                            <div class="col-md-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                <select id="seleDist" name="ODistrictId" class="form-control t-center"></select>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <input type="text" name="OAddress" class="form-control" placeholder="請輸入地址" required/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <section class="bg-page flex-c-m p-t-0 p-b-0">
+                    <h2 class="tit11 t-center">
+                        付款方式
+                    </h2>
+                </section>
+                <div id="checkboxGroup" class="div1">
+                    <div class="container">
+                        <ul>
+                            <li>
+                                <input type="checkbox" checked="checked" id="transe" name="OCheck" value="匯款" />
+                                <label>匯款</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="card" name="OCheck" value="信用卡" />
+                                <label>信用卡</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="money" name="OCheck" value="現金面交" />
+                                <label>現金面交</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="m-t-190 p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="text-center">
+                            <input type="submit" value="購買" class="btn btn-success" onclick="return confirm('確定購買嗎?') " />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content-intro bg-white p-t-20 p-b-70">
+            <div class="container">
+                <div class="p-4 pt-0 border-top-0 bg-transparent text-center">
+                    <a class="btn btn-secondary m-l-20" type="submit" asp-area="" asp-controller="ShoppingCart" asp-action="ViewCart">返回購物車</a>
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </form>
+</section>
+
+@section Scripts{
+    @*做checkbox單選*@
+    <script id="checkboxonly">
+        let seleCity = document.querySelector('#seleCity')
+        let seleDist = document.querySelector('#seleDist')
+
+        //city change
+        seleCity.addEventListener('change', function () {
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        })
+
+        Load_City()
+        //add citylist
+        async function Load_City() {
+            const response = await fetch('/Member/City')
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.cityName, item.cityIdPk)
+                seleCity.options.add(opt)
+            })
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        }
+
+        // citylist
+        async function Load_District() {
+            const response = await fetch('/Member/District?id=' + seleCity.value)
+            const datas = await response.json()
+            while (seleDist.length > 0) {
+                seleDist.remove(seleDist.length - 1)
+            }
+            datas.forEach((item) => {
+                const opt = new Option(item.districtName, item.districtIdPk)
+                seleDist.options.add(opt)
+            })
+        }
+
+
+
+        $('#checkboxGroup li input').click(function () {
+            if ($(this).prop('checked')) {
+                $('#checkboxGroup li input').prop('checked', false);
+                $(this).prop('checked', true);
+            }
+        })
+
+    </script>
+
+}
+

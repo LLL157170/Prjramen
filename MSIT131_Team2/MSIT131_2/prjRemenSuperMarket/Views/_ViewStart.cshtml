@@ -1,0 +1,25 @@
+﻿@{   
+    switch (ViewContext.RouteData.Values["Controller"].ToString())
+    {
+        case "Ramen":
+
+        case "RamenStore":
+            Layout = "_RamenLayout"; break;
+        case "Home":
+        case "ShoppingCart":
+        case "ProductInfo":
+        case "Pay":
+            Layout = "_Shopping"; break;
+        case "ProductDetail":
+        case "Goods":
+        case "SalesInfo":
+        case "EMList":
+            Layout = "_EmpolyeeLayout"; break;
+        case "MMLogin":
+            Layout = "_MemberLoginLayout"; break;
+        case "EMLogin":
+            Layout = "_EmpolyeeLoginLayout"; break;
+        default:
+            Layout = "_Shopping"; break;
+    }
+}

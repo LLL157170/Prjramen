@@ -1,0 +1,55 @@
+﻿@model prjRemenSuperMarket.ViewModel.CRamenAdd
+
+@{
+    ViewData["Title"] = "RamenAdd";
+}
+<div style="height:160px"></div>
+<h1>RamenAdd</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RamenAdd" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RamenStoreId" class="control-label"></label>
+                <select asp-for="RamenStoreId" class="form-control" id="SelRamenStoreId"></select>
+                <span asp-validation-for="RamenStoreId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductName" class="control-label"></label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductPicture" class="control-label"></label>
+                <input type="file" asp-for="ProductPicture" class="form-control" />
+                <span asp-validation-for="ProductPicture" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let SelRamenStoreId = document.querySelector('#SelRamenStoreId')
+
+        async function Load_Selector_List(Selector, LoadList) {
+            const response = await fetch('/RamenStore/' + LoadList)
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.name, item.id)
+                Selector.options.add(opt)
+            })
+        }
+
+        Load_Selector_List(SelRamenStoreId, 'StoreName_List')
+    </script>
+}

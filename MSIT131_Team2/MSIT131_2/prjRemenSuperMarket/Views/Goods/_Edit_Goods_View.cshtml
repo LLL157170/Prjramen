@@ -1,0 +1,140 @@
+﻿@model prjRemenSuperMarket.ViewModel.CGoods
+
+<form>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="ProductIdFk" class="control-label"></label>
+            <input id="SelProduct" list="ProductList" class="form-control border" value="@Model.ProductName" type="text"/>
+            <datalist id="ProductList"></datalist>
+            <input asp-for="ProductIdFk" class="form-control" id="SelProductName" hidden="hidden"/>
+            <span asp-validation-for="MerchantIdFk" class="text-danger"></span>
+            <span id="ValProductName" class="text-danger" hidden="hidden">沒有這個產品</span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="MerchantIdFk" class="control-label"></label>
+            <select asp-for="MerchantIdFk" class="form-select" id="SelMerchantName"></select>
+            <span asp-validation-for="MerchantIdFk" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Counts" class="control-label"></label>
+            <input asp-for="Counts" class="form-control border" />
+            <span asp-validation-for="Counts" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="PurchaseCost" class="control-label"></label>
+            <input asp-for="PurchaseCost" class="form-control border" />
+            <span asp-validation-for="PurchaseCost" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="PurchaseDate" class="control-label"></label>
+            <input asp-for="PurchaseDate" class="form-control border" type="date" />
+            <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="ShelfLife" class="control-label"></label>
+            <input asp-for="ShelfLife" class="form-control border" type="date" />
+            <span asp-validation-for="ShelfLife" class="text-danger"></span>
+            <label id="StateText" style="color:darkred;font-size:16px" hidden="hidden"></label>
+        </div>
+    </div>
+
+    <!-- #region -- 隱藏屬性(不顯示) -- -->
+    <div class="form-group" hidden="hidden">
+        <input asp-for="GoodsIdPk" />
+        <input asp-for="LaunchDate" type="date" />
+    </div>
+</form>
+
+<script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+{
+    async function Load_Selector_List(Selector, LoadList, IsFirstLoad) {
+
+        $(Selector).empty()
+
+        const response = await fetch('/SelectorList/' + LoadList)
+        const datas = await response.json()
+
+        await $.each(datas, (index, data) => {
+            if ($(Selector).attr('id') == 'ProductList')
+                $('<option/>').data('PID', data.id).val(data.name).appendTo(Selector)
+            else
+                $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+        })
+        
+        if (IsFirstLoad)
+            $(Selector).val(Set_Selector_Value_From_Model(Selector))
+    }
+
+    function Set_Selector_Value_From_Model(Selector) {
+        switch ($(Selector).attr('id')) {
+            case 'SelProductName': return @Model.Good.ProductIdFk;
+            case 'SelMerchantName': return @Model.Good.MerchantIdFk;
+            default: return 1;
+        }
+    }
+
+    Load_Selector_List($('#ProductList'), 'ProductName', true)
+    Load_Selector_List($('#SelMerchantName'), 'MerchantName')
+
+    
+
+    let IsUseOpt = false
+
+    $(document).on('change', '#SelProduct', function () {
+        IsUseOpt = false
+        var val = $(this).val();
+
+        $.each($('datalist>option'), (index, opt) => {
+            if ($(opt).val() === val) {
+                $('#SelProductName').val($(opt).data('PID'))
+                IsUseOpt = true
+                return false
+            }
+        })
+
+        Show_Valid_Message()
+
+        console.log($('#SelProductName').val())
+    });
+
+    SubmitButton.click(Show_Valid_Message)
+
+    function Show_Valid_Message() {
+        if (IsUseOpt)
+            $('#ValProductName').attr('hidden', true)
+        else {
+            $('#SelProductName').val(0)
+            $('#ValProductName').attr('hidden', false)
+        }
+    }
+
+    $('input[name="ShelfLife"]').change(Check_State)
+
+    Check_State()
+
+    function Check_State() {
+        $('#StateText').attr('hidden', false)
+        let ShelfLife = new Date($('input[name="ShelfLife"]').val()).setHours(0, 0, 0, 0)
+        let Today = new Date().setHours(0, 0, 0, 0)
+
+        let diffTime = ShelfLife - Today
+
+        let diffDays = diffTime / (1000 * 60 * 60 * 24)
+
+        if (diffDays < 0)
+            $('#StateText').text('(貨物狀態:過期)')
+        else if (diffDays >= 0 && diffDays <= 7)
+            $('#StateText').text('(貨物狀態:即期)')
+        else
+            $('#StateText').text('(貨物狀態:正常)')
+
+    }
+}
+</script>
+

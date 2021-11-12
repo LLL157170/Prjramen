@@ -1,0 +1,114 @@
+﻿@model prjRemenSuperMarket.Models.Member
+
+@{
+    ViewData["Title"] = "MemberEdit";
+}
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/memberdata.jpg);">
+        <h2 class="tit6 t-center">
+            會員資料
+        </h2>
+    </section>
+    <section class="product-details bg2-pattern p-t-55 p-b-113">
+        <div class="container">
+
+            <form asp-action="MemberEdit">
+                <div style="padding-left:450px;padding-right:450px">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <input type="hidden" asp-for="MemberIdPk" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label" style="font-size:24px;font-weight:700">姓名</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Phone" class="control-label" style="font-size:24px;font-weight:700">電話</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:24px;font-weight:700">地址</label>
+                        <input type="text" class="form-control" value="@ViewBag.longaddress" readonly="readonly"/>
+                        <input type="button" id="showbtn" value="編輯地址" class="btn btn-primary m-r-20"style="margin-top:10px;margin-bottom:20px"/>
+                        <br />
+                        <div class="row"  id="addressbox">
+                            <div class="col-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                <select id="seleCity" class="form-control t-center" name="CityName"style="display:none" ></select>
+                            </div>
+                            <div class="col-md-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                <select id="seleDist" class="form-control t-center" name="DistrictName" style="display:none"></select>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;margin-bottom:20px">
+                            <input type="text" id="txtAddr" name="Address" class="form-control" placeholder="請輸入地址" style="display:none" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EMail" class="control-label" style="font-size:24px;font-weight:700">電子信箱</label>
+                        <input asp-for="EMail" class="form-control" />
+                        <span asp-validation-for="EMail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Birthday" class="control-label" style="font-size:24px;font-weight:700">出生年月日</label>
+                        <input asp-for="Birthday" class="form-control" type="date"/>
+                        <span asp-validation-for="Birthday" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group t-center" style="margin-top:60px">
+                    <input type="submit" value="保存" class="btn btn-primary m-r-20" />
+                    <a class="btn btn-warning" href="~/Member/PasswordEditCheck/@ViewBag.kk">修改密碼</a>
+                </div>
+            </form>
+            
+
+        </div>
+    </section>
+</body>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    var xhr = new XMLHttpRequest();
+        var Distid = 1;
+        xhr.addEventListener('load', function () {
+            var data = JSON.parse(xhr.responseText);
+            data.forEach((item)=> {
+                $('#seleCity').append('<option id=' + item.cityIdPk+'>' + item.cityName + '</option>');
+        })
+        })
+        xhr.open('get', '@Url.Content("~/member/city")')
+        xhr.send()
+        $('#seleCity').change(function () {
+            Distid = $(this).find(':selected').attr('id');
+            var xhr2 = new XMLHttpRequest();
+            xhr2.addEventListener('load', function () {
+                var data = JSON.parse(xhr2.responseText);
+                $('#seleDist option').remove();
+                data.forEach((item) => {
+                    $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+                })
+                })
+
+            xhr2.open('get', '@Url.Action("District", "member")?id='+Distid)
+            xhr2.send();
+
+        })
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener('load', function () {
+            var data = JSON.parse(xhr2.responseText);
+            data.forEach((item) => {
+                $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+            })
+        })
+        xhr2.open('get', '@Url.Action("District", "member")?id=1')
+        xhr2.send();
+        $("#showbtn").click(function () {
+            $("#seleCity").show();
+            $("#seleDist").show();
+            $("#txtAddr").show();
+        })
+    </script>
+}

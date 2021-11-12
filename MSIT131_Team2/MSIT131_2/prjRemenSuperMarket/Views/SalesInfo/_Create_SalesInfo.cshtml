@@ -1,0 +1,244 @@
+﻿@model prjRemenSuperMarket.ViewModel.CSalesInfo
+
+<style>
+    tr, th {
+        text-align: center;
+    }
+</style>
+
+<form>
+    @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+    <div class="form-row">
+        <div class="col-md-5 mb-3">
+            <label asp-for="ProductIdFk" class="control-label"></label>
+            <input id="SelProduct" list="ProductList" class="form-control border" placeholder="輸入產品關鍵字..." />
+            <datalist id="ProductList"></datalist>
+            <input asp-for="ProductIdFk" class="form-control" id="SelProductName" hidden="hidden" />
+            <span id="ValProductName" name="ValidMsg" class="text-danger" hidden="hidden">沒有這個產品</span>
+            <span id="ValProductName2" name="ValidMsg" class="text-danger" hidden="hidden">未輸入</span>
+
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="SalesStatesIdFk" class="control-label"></label>
+            <select asp-for="SalesStatesIdFk" class="form-select" id="SelSalesStates"></select>
+            <span id="ValSalesStates" name="ValidMsg" class="text-danger" hidden="hidden">該產品所有狀態皆已上架</span>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-5 mb-3">
+            <label asp-for="PriceFactorFk" class="control-label"></label>
+            <select asp-for="PriceFactorFk" class="form-select" id="SelPriceFactor"></select>
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="DiscountIdFk" class="control-label"></label>
+            <label class="control-label" style="color:red" name="sysText">(系統選定)</label>
+            <select asp-for="DiscountIdFk" class="form-select" id="SelDiscount"></select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-5 mb-3">
+            <label asp-for="Counts" class="control-label"></label>
+            <input asp-for="Counts" class="form-control border" id="InputCount" readonly />
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="UnitPrice" class="control-label">販售價格（進貨價格*售價係數*折扣）</label>
+            <input asp-for="UnitPrice" class="form-control border" id="InputUnitPrice" readonly />
+        </div>
+    </div>
+
+    <!-- #region -- 隱藏屬性(不顯示) -- -->
+    <div class="form-group" hidden="hidden">
+        <label asp-for="GoodsIdFk" class="control-label"></label>
+        <input asp-for="GoodsIdFk" class="form-control" id="InputGoodsId" />
+
+        <!-- 隱藏列表(用於選擇折扣係數) -->
+        <select class="form-control" id="SelDiscountFactor"></select>
+
+    </div>
+    <!-- #endregion -->
+</form>
+
+<div id="GoodsList" class="col-md-12"></div>
+
+<script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    {
+
+        let SelGoodName = document.querySelector('#SelGoodName');
+        let SelSalesStates = document.querySelector('#SelSalesStates');
+        let SelPriceFactor = document.querySelector('#SelPriceFactor');
+        let SelDiscount = document.querySelector('#SelDiscount');
+        let InputGoodsId = document.querySelector('#InputGoodsId');
+        let InputCount = document.querySelector('#InputCount');
+        let InputUnitPrice = document.querySelector('#InputUnitPrice');
+
+        let SelDiscountFactor = document.querySelector('#SelDiscountFactor');
+
+        //async function Load_Selector_List(Selector, LoadList) {
+        //    const response = await fetch('/SelectorList/' + LoadList)
+        //    const datas = await response.json()
+
+        //    Selector.innerHTML = ''
+
+        //    datas.forEach((item) => {
+        //        const opt = new Option(item.name, item.id)
+        //        Selector.options.add(opt)
+        //    })
+
+
+
+        //    if (Selector == SelSalesStates)
+        //        Load_Goods_List()
+
+        //    if (Selector == SelDiscount)
+        //        datas.forEach((item) => {
+        //            const opt = new Option(item.factor, item.id)
+        //            SelDiscountFactor.options.add(opt)
+        //        })
+        //}
+
+        Load_Selector_List(SelGoodName, 'ProductName')
+        Load_Selector_List(SelPriceFactor, 'PriceFactor')
+        Load_Selector_List(SelDiscount, 'DiscountName')
+
+        async function Load_Selector_List(Selector, LoadList) {
+            $(Selector).empty()
+
+            const response = await fetch('/SelectorList/' + LoadList)
+            const datas = await response.json()
+
+            await $.each(datas, (index, data) => {
+                if ($(Selector).attr('id') == 'ProductList')
+                    $('<option/>').data('PID', data.id).val(data.name).appendTo(Selector)
+                else
+                    $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+            })
+
+            //if ($(Selector).attr('id') == 'ProductList')
+            //    Load_Selector_List(SelSalesStates, 'Exclude_SalesStates?ProductID=' + SelGoodName.value)
+
+            if ($(Selector).attr('id') == 'SelSalesStates') {
+                if ($(Selector).find('option').length != 0) {
+                    Load_Goods_List()
+                    $('#ValSalesStates').attr('hidden', true)
+                }
+                else
+                    $('#ValSalesStates').attr('hidden', false)
+            }
+
+            if ($(Selector).attr('id') == 'SelDiscount') {
+                $.each(datas, (index, data) => {
+                    $('<option/>').val(data.id).text(data.factor).appendTo($('#SelDiscountFactor'))
+                })
+            }
+
+            if ($(Selector).attr('id') == 'SelPriceFactor') {
+                $(Selector).val(3)
+            }
+
+        }
+
+        SubmitButton.click(function () {
+            if (!IsUseOpt && $('#ValProductName').is(':hidden'))
+                $('#ValProductName2').attr('hidden',false)
+        })
+
+
+        let IsUseOpt = false
+
+        $(document).on('change', '#SelProduct', function () {
+            IsUseOpt = false
+            var val = $(this).val();
+            var PID
+            $.each($('datalist>option'), (index, opt) => {
+                if ($(opt).val() === val) {
+                    $('#SelProductName').val($(opt).data('PID'))
+                    $('#ValProductName2').attr('hidden', true)
+                    PID = $(opt).data('PID')
+                    IsUseOpt = true
+
+                    return false
+                }
+            })
+
+            Show_Valid_Message()
+            if (IsUseOpt)
+                Load_Selector_List(SelSalesStates, 'Exclude_SalesStates?ProductID=' + PID)
+            else
+                SelSalesStates.innerHTML = ''
+
+            console.log($('#SelProductName').val())
+        });
+
+        function Show_Valid_Message() {
+            if (IsUseOpt)
+                $('#ValProductName').attr('hidden', true)
+            else {
+                $('#SelProductName').val(0)
+                $('#ValProductName').attr('hidden', false)
+                $('#ValSalesStates').attr('hidden', true)
+            }
+        }
+
+        //載入符合ProductID的未過期貨物清單
+        function Load_Goods_List() {
+            $('#GoodsList').load(`/SalesInfo/_GoodsList_View?ProductID=${$('#SelProductName').val()}&StateID=${SelSalesStates.value}`);
+
+            switch (Number(SelSalesStates.value)) {
+                case 1:
+                    IsSystemLock = true
+                    SelDiscount.value = 4
+                    $('#SelDiscount').attr('readonly', true)
+                    $('#SelDiscount').find('option').attr('hidden', true)
+                    $('#SelDiscount').addClass('form-control')
+                    $('#SelDiscount').removeClass('form-select')
+                    break;
+                case 3:
+                    IsSystemLock = true
+                    SelDiscount.value = 2
+                    $('#SelDiscount').attr('readonly', true)
+                    $('#SelDiscount').find('option').attr('hidden', true)
+                    $('#SelDiscount').addClass('form-control')
+                    $('#SelDiscount').removeClass('form-select')
+                    break;
+                default:
+                    IsSystemLock = false
+                    SelDiscount.value = 4
+                    $('#SelDiscount').attr('readonly', false)
+                    $('#SelDiscount').find('option').attr('hidden', false)
+                    $('#SelDiscount').addClass('form-select')
+                    $('#SelDiscount').removeClass('form-control')
+                    break;
+            }
+        }
+
+        //取得選擇的貨物數量及價格
+        function Get_Check_Goods_Info_ByCreate() {
+            let CheckBox = $('input[name="check"]:checked')
+
+            InputCount.value = ''
+            InputUnitPrice.value = ''
+            InputGoodsId.value = null
+            InputCount.value = $(CheckBox).parents('tr').find('td:nth-child(6)').text()
+            InputUnitPrice.value = $(CheckBox).parents('tr').find('td:nth-child(7)').text()
+            InputGoodsId.value = $(CheckBox).parents('tr').find('td:last-child').text()
+
+            //計算販售價格
+            if (InputUnitPrice.value.length != 0) {
+                InputUnitPrice.value *= SelPriceFactor.options[SelPriceFactor.selectedIndex].text
+                InputUnitPrice.value *= SelDiscountFactor.options[SelDiscount.selectedIndex].text
+                InputUnitPrice.value = Math.round(InputUnitPrice.value)
+            }
+        }
+
+        //SelGoodName.addEventListener('change', function () {
+        //    Load_Selector_List(SelSalesStates, 'Exclude_SalesStates?ProductID=' + SelGoodName.value)
+        //})
+        SelSalesStates.addEventListener('change', Load_Goods_List)
+        SelDiscount.addEventListener('change', Get_Check_Goods_Info_ByCreate)
+        SelPriceFactor.addEventListener('change', Get_Check_Goods_Info_ByCreate)
+
+
+    }
+</script>

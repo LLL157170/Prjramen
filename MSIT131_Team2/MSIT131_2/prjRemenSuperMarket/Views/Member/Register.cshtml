@@ -1,0 +1,117 @@
+﻿@model prjRemenSuperMarket.ViewModel.CRegister
+
+@{
+    ViewData["Title"] = "Register";
+}
+<div style="height:160px"></div>
+<h1>會員註冊</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+
+        <button class="demo btn btn-primary" id="demo">demo</button>
+
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control inputname"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CityName" class="control-label"></label>
+                <select asp-for="CityName" id="seleCity" class="form-control"></select>
+                <span asp-validation-for="CityName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DistrictName" class="control-label"></label>
+                <select asp-for="DistrictName" id="seleDist" class="form-control"></select>
+                <span asp-validation-for="DistrictName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EMail" class="control-label"></label>
+                <input asp-for="EMail" class="form-control" />
+                <span asp-validation-for="EMail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Birthday" class="control-label"></label>
+                <input asp-for="Birthday" class="form-control" type="date" />
+                <span asp-validation-for="Birthday" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="建立" class="btn btn-primary" />
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script id="Address">
+        var xhr = new XMLHttpRequest();
+        var Distid = 1;
+        xhr.addEventListener('load', function () {
+            var data = JSON.parse(xhr.responseText);
+            data.forEach((item)=> {
+                $('#seleCity').append('<option id=' + item.cityIdPk+'>' + item.cityName + '</option>');
+        })
+        })
+        xhr.open('get', '@Url.Content("~/member/city")')
+        xhr.send()
+        $('#seleCity').change(function () {
+            Distid = $(this).find(':selected').attr('id');
+            var xhr2 = new XMLHttpRequest();
+            xhr2.addEventListener('load', function () {
+                var data = JSON.parse(xhr2.responseText);
+                $('#seleDist option').remove();
+                data.forEach((item) => {
+                    $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+                })
+                })
+
+            xhr2.open('get', '@Url.Action("District", "member")?id='+Distid)
+            xhr2.send();
+
+        })
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener('load', function () {
+            var data = JSON.parse(xhr2.responseText);
+            data.forEach((item) => {
+                $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+            })
+        })
+        xhr2.open('get', '@Url.Action("District", "member")?id=1')
+        xhr2.send();
+        //var demo = document.getElementById('demo');
+        //demo.click(function () {
+        //    var name = document.getElementById('inputname');
+        //    name.text("小白")
+        //})
+        $("#demo").click(function () {
+            $("#Name").val("王小明");  //所有input元素
+            $("#Phone").val("0912123123");
+            $("#Address").val("中正路644號");
+            $("#EMail").val("XiaoMing644@gmail.com");
+            $("#Password").val("aabb1212");
+            $("#Birthday").val("2000-02-02");
+        });
+    </script>
+}

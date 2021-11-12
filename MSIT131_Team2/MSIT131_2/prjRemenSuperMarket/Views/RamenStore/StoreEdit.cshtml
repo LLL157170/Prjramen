@@ -1,0 +1,106 @@
+﻿@model prjRemenSuperMarket.ViewModel.CStoreAdd
+
+@{
+    ViewData["Title"] = "StoreEdit";
+}
+<div style="height:160px"></div>
+<h1>StoreEdit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="StoreEdit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="StoreName" class="control-label"></label>
+                <input asp-for="StoreName" class="form-control" />
+                <span asp-validation-for="StoreName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Introduce" class="control-label"></label>
+                <input asp-for="Introduce" class="form-control" />
+                <span asp-validation-for="Introduce" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CityId" class="control-label"></label>
+                <select id="seleCity" asp-for="CityId" class="form-control"></select>
+                <span asp-validation-for="CityId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DistrictId" class="control-label"></label>
+                <select id="seleDist" asp-for="DistrictId" class="form-control"></select>
+                <span asp-validation-for="DistrictId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Logo" class="control-label">推廣照放此</label><br />
+                <label>-原圖片：</label>
+                <img src="data:image/jpeg;base64,@Model.LogoBase64" width="200" /><br />
+                <label>-修改為：</label>
+                <input asp-for="Logo" type="file" class="form-control" />
+                <span asp-validation-for="Logo" class="text-danger"></span>
+            </div>
+
+            <div hidden="hidden">
+                <input asp-for="RamenStoreId" />
+                <input asp-for="MemberId" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="儲存修改" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let seleCity = document.querySelector('#seleCity')
+        let seleDist = document.querySelector('#seleDist')
+
+        async function Load_Selector_List(Selector, LoadList, IsFirstLoad) {
+            const response = await fetch('/Member/' + LoadList)
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.name, item.id)
+                Selector.options.add(opt)
+            })
+
+            if (IsFirstLoad)
+                Selector.value = Set_Selector_Value_From_Model(Selector)
+        }
+
+        function seleCity_Change() {
+            seleDist.innerHTML = ''
+            Load_Selector_List(seleDist, 'District?cityID=' + seleCity.value)
+        }
+
+        function Set_Selector_Value_From_Model(Selector) {
+            switch (Selector) {
+                case seleCity: return @Model.CityId
+                case seleDist: return @Model.DistrictId
+                default: return 1
+            }
+        }
+
+        seleCity.addEventListener('change', seleCity_Change)
+        Load_Selector_List(seleCity, 'City', true)
+        Load_Selector_List(seleDist, 'District?cityID=' + @Model.CityId, true)
+    </script>
+}

@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "List";
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/employee.jpg);">
+        <h2 class="tit6 t-center">
+            產品列表
+        </h2>
+    </section>
+    <section class="p-t-10" style="        background-color: #ebebeb;">
+        <div class="container">
+            <p style="margin-top:16px;">
+                <a asp-action="Create" class="btn btn-primary">新增產品</a>
+            </p>
+
+            <hr style="height:2px">
+
+            <div class="form-row">
+
+                <div class="col-md-2 mb-3">
+                    <label>產品名稱</label>
+                    <input id="SelProduct" list="ProductList" class="form-control border" placeholder="菜" />
+                    <datalist id="ProductList"></datalist>
+                </div>
+
+                <div class="col-md-2">
+                    <button id="SearchBtn" type="button" class="btn btn-info" style="margin-top:30px">查詢</button>
+                </div>
+            </div>
+
+
+            <div id="DivList">
+
+            </div>
+            </div>
+        </section>
+
+</body>
+@section Scripts{
+    <script>
+        async function Load_Selector_List(Selector, LoadList) {
+            const response = await fetch('/SelectorList/' + LoadList)
+            const datas = await response.json()
+
+            $.each(datas, (index, data) => {
+                if ($(Selector).attr('id') == 'ProductList')
+                    $('<option/>').data('PID', data.id).text(data.name).appendTo(Selector)
+                else
+                    $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+            })
+
+            $('#SelCategory').val(1)
+        }
+
+        $('#SearchBtn').click(function () {
+            if ($('#SelProduct').val() != '')
+                $('#SelCategory').val($('#SelCategory>option:first-child').val())
+
+            $('#SelProduct').attr('placeholder','輸入產品關鍵字...')
+
+            $('#DivList').load(`/productDetail/_ProductList?KeyWord=${$('#SelProduct').val()}`)
+        })
+
+        Load_Selector_List($('#ProductList'), 'ProductName')
+
+        $('#DivList').load('/productDetail/_ProductList?KeyWord=菜')
+    </script>
+}
+
+
+
+

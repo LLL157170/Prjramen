@@ -1,0 +1,135 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CSalesInfo>
+
+<style>
+    .favorite {
+        color: gold;
+    }
+
+    #NotFindText p {
+        font-size: 20px;
+    }
+</style>
+
+<div class="row">
+    <div>
+        <h4>查詢共 @ViewBag.Product 筆結果：</h4>
+    </div>
+    @foreach (var product in this.Model)
+    {
+        <div class="col-sm-4 col-md-4" name="productdiv">
+            <div class="col mb-5">
+                <div class="card h-100">
+                    @*登入時才會載入icon*@
+                    @if (ViewBag.IsLogin == true)
+                    {
+                        <div @*class="flex-w p-r-1 p-l-1 justify-content-between"*@>
+                            <span style="float:right">
+                                <input name="PID@(product.ProductIdFk)" value="@product.ProductIdFk" hidden="hidden" />
+                                @*<i class="bi-emoji-angry me-1 fa-2x blacklist" />*@
+                                <i class="bi-star me-1 fa-2x favorite" />
+                            </span>
+                        </div>
+                    }
+
+                    @*Product image*@
+                    <img class="card-img-top" src="data:image/jpeg;base64,@product.PictureBase64" width="450" height="300" alt="..." />
+                    @*Product details*@
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            @*Product name*@
+                            <h4 class="fw-bolder">@product.GoodName</h4>
+                            @*Product price*@
+                            @if (product.PriceInterval == "缺貨中")
+                            {
+                                <h5 style="color:red">@product.PriceInterval</h5>
+                            }
+                            else
+                            {
+                                <h5>@product.PriceInterval</h5>
+                            }
+                        </div>
+                    </div>
+                    @*Product actions*@
+                    <div class="social p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="text-center">
+                            <a class="btn btn-outline-white mt-auto" href="~/ProductInfo/Detail?id=@product.ProductIdFk">檢視商品</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Count() == 0)
+    {
+        <div id="NotFindText" style="min-width:200px; margin-top:150px" class="d-flex align-items-center flex-column">
+            <h1>找不到您想要的食材？</h1>
+            <p></p>
+            <p>您可以檢查是否關鍵字有輸入錯誤後重新搜尋或是當前篩選器中未包含該食材種類</p>
+            <p>您也可以登入後點擊右上方客服聯絡我們</p>
+            <p>我們將會為您解答</p>
+        </div>
+    }
+
+</div>
+
+<script>
+    {
+        //當分頁在第一頁時
+        if ($('.active-pagination').text() == 1) {
+
+            //計算所需頁面總數量
+            const PageCount = Math.ceil(Get_ProductCount() / 9)
+
+            //移除其他第1頁以外的按鈕(當從其他頁面返回第一頁時)
+            $('#Page>button').first().siblings().remove()
+
+            //設置按鈕事件
+            $('.active-pagination').off('click') //移除click事件避免事件持續累積
+            $('.active-pagination').first().click(Skip_Load_Product)
+
+            //依頁面總數量建立分頁按鈕
+            for (var i = 2; i <= PageCount; i++) {
+                $('<button/>').text(i).addClass('item-pagination flex-c-m trans-0-4').click(Skip_Load_Product).appendTo('#Page')
+            }
+        }
+
+        //回傳產品總數量
+        function Get_ProductCount() {
+            return @ViewBag.Product;
+        }
+                
+        //收藏icon點擊時
+        $('.favorite').click(function () {
+            $(this).toggleClass('bi-star bi-star-fill') //切換樣式
+            Favorite_Click($(this).siblings('input').val());
+        })
+
+        //$('.blacklist').click(function () {
+        //    $(this).toggleClass('bi-emoji-angry bi-emoji-angry-fill')
+        //})
+
+        const url = "https://localhost:44333/api/APIHome"
+
+        //頁面載入後設置收藏商品
+        $.ajax({
+            type: 'GET',
+            url: url +'/GetCollects',
+        }).done((datas) => {
+            $.each(datas, (index, data) => {
+                if (data.collectTypeIdFk == 1)
+                    $(`input[name="PID${data.productIdFk}"]`).siblings('.favorite').toggleClass('bi-star bi-star-fill')
+            })
+        })
+
+        //點擊收藏icon
+        function Favorite_Click(ProductID) {
+            $.ajax({
+                type: 'POST',
+                url: url +'/Add_Favorite',
+                contentType: 'application/json',
+                data: ProductID,
+            })
+        }
+    }
+</script>

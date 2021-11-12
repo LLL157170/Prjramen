@@ -1,0 +1,76 @@
+﻿@model prjRemenSuperMarket.ViewModel.CRamenAdd
+
+@{
+    ViewData["Title"] = "RamenEdit";
+}
+<div style="height:160px"></div>
+<h1>RamenEdit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RamenEdit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" hidden="hidden">
+                <label asp-for="RamenProductId" class="control-label"></label>
+                <input asp-for="RamenProductId" class="form-control" />
+                <span asp-validation-for="RamenProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RamenStoreId" class="control-label"></label>
+                <select asp-for="RamenStoreId" class="form-control" id="SelRamenStoreId"></select>
+                <span asp-validation-for="RamenStoreId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductName" class="control-label"></label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductPicture" class="control-label"></label>
+                <label>-原圖片：</label>
+                <img src="data:image/jpeg;base64,@Model.ProductPictureBase64" width="200" /><br />
+                <label>-修改為：</label>
+                <input asp-for="ProductPicture" type="file" class="form-control" />
+                <span asp-validation-for="ProductPicture" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+        let SelRamenStoreId = document.querySelector('#SelRamenStoreId')
+
+        async function Load_Selector_List(Selector, LoadList, IsFirstLoad) {
+            const response = await fetch('/RamenStore/' + LoadList)
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.name, item.id)
+                Selector.options.add(opt)
+            })
+
+            if (IsFirstLoad)
+                Selector.value = Set_Selector_Value_From_Model(Selector)
+        }
+
+        function Set_Selector_Value_From_Model(Selector) {
+            switch (Selector) {
+                case SelRamenStoreId: return @Model.RamenStoreId
+                default: return 1
+            }
+        }
+
+        Load_Selector_List(SelRamenStoreId, 'StoreName_List', true)
+</script>
+}

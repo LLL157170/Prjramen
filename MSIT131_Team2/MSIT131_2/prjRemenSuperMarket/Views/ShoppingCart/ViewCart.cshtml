@@ -1,0 +1,188 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CShoppingCart>
+
+@{
+    ViewBag.Title = "ViewCart";
+}
+
+<style>
+    .big-bot {
+        padding-left: 30px;
+        padding-right: 30px;
+        border-color:black;
+    }
+</style>
+
+<body class="animsition">
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="background-image: url(/images/ShoppingCart.jpg);">
+        <h2 class="tit6 t-center">
+            購物車
+        </h2>
+    </section>
+    <form asp-action="ViewCart" name="theForm">
+        <section class="section-SaleInfo bg2-pattern p-t-0 p-b-0">
+            <div class="container">
+                <table class="table">
+                    <tr>
+                        <th>序</th>
+                        <th>產品</th>
+                        <th>圖片</th>
+                        <th>價格</th>
+                        <th>購買數量</th>
+                        <th>小計</th>
+                        <th></th>
+                    </tr>
+
+                    @{
+                        int count = 0;
+                        int num = count + 1;
+                        decimal payment = 0;
+                        foreach (var item in Model)
+                        {
+                            <tr id="row">
+                                <div><td>
+                                    @num
+                                </td></div>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.productName)
+                                </td>
+                                <td>
+                                    <img class="card-img-top" src="data:image/jpeg;base64,@item.PictureBase64" style="width:100px" />
+                                </td>
+                                <td>
+                                    <label id="unitprice">@item.price</label>
+                                </td>
+                                <td>
+                                    <input type="hidden" name="models[@count].txtFid" value="@item.productId" />
+                                    <input type="number" id="itemcount" class="number" name="models[@count].txtCount" value="@item.count" min="1" max="@item.product.Counts"/>
+                                </td>
+                                <td>
+                                    <label id="totalprice" class="totalprice" name="totalPrice[@count]">@item.小計</label>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" name="deleteButton">刪除</button>
+                                </td>
+                            </tr>
+
+                            count++;
+                            payment += item.小計;
+                        }
+                    }
+
+                </table>
+            </div>
+            <div class="p-t-0 p-b-0">
+                
+                    <span style="font-size: 20px;font-weight: bold; padding-left:1000px;text-decoration: underline;">
+                        <label style="text-decoration: underline;">應付金額：</label>
+                    </span>
+                    <span style="        font-size: 20px;        font-weight: bold;text-decoration: underline;">
+                        <label id="payment" style="text-decoration: underline;">
+                            @payment
+                        </label>
+                    </span>
+                
+                
+                <span style="padding-left:40px">
+                    <input name="hrefString" hidden="hidden" />
+                    <a href="/Pay/PaymentList" class="big-bot btn btn-success" id="PayLink">結帳</a>
+                </span>
+            </div>
+        </section>
+        <section class="content-intro bg-white p-t-20 p-b-70">
+            <div class="container">
+                <div class="social p-4 pt-0 border-top-0 bg-transparent text-center">                   
+                        <a class="big-bot btn btn-white " id="KeepShopping" asp-controller="Home" asp-action="Page">繼續購物</a>                   
+                </div>
+
+            </div>
+
+        </section>
+    </form>
+</body>
+
+@section Scripts{
+    <script>
+
+        Check_Count()
+        $('#itemcount').blur(Check_Count)
+        
+
+        function Check_Count() {
+            let nb = Number($('#itemcount').val())
+            let max = Number($('#itemcount').attr('max'))
+            let min = Number($('#itemcount').attr('min'))
+
+            if (nb > max)
+                $('#itemcount').val(max)
+
+            if (nb < min)
+                $('#itemcount').val(min)
+        }
+
+        $('table').on('change', '#itemcount', Calculate_Payment)
+
+        function Calculate_Payment() {
+            let payment = 0
+
+            $('table').find('tr:visible').each(function (index, ele) {
+                let count = $(ele).find('#itemcount').val()
+                let price = $(ele).find('#unitprice').text()
+                let total = count * price
+
+                if (!isNaN(total)) {
+                    payment += Number(total)
+                    $(ele).find('#totalprice').text(total)
+                }
+            })
+
+            $('#payment').text(payment)
+
+            if (payment == 0) {
+                $('#PayLink').removeAttr('href')
+                $('#PayLink').removeClass('btn btn-success')
+                $('#PayLink').addClass('btn btn-white')
+
+            }
+        }
+
+        //使所有超連結無效
+        $('a').click(function (e) {
+            e.preventDefault()
+        })
+
+        //當視窗元素被點擊時
+        window.onclick = e => {
+            let ClickElement = $(e.target)
+
+            //如果點擊元素有href屬性(代表點擊a元素)
+            if (ClickElement.attr('href') != null) {
+                //將點擊元素(a元素)的href值傳給名為"hrefString"的input(Submit用)
+                $('input[name="hrefString"]').val(ClickElement.attr('href'))
+                console.log(ClickElement.attr('href'))
+                //Submit
+                document.theForm.submit()
+
+                //Debug用
+                //setTimeout(s,3000)
+            }
+        }
+
+        //Debug用
+        //function s() {
+        //    document.theForm.submit()
+        //}
+
+        //刪除
+        $('button[name="deleteButton"]').click(function () {
+            //將商品數量設為0
+            $(this).parents('tr').find('input[name*="txtCount"]').val(0)
+            //隱藏該資料行
+            $(this).parents('tr').attr('hidden', true)
+
+            Calculate_Payment()
+        })
+
+        Calculate_Payment()
+
+    </script>
+}

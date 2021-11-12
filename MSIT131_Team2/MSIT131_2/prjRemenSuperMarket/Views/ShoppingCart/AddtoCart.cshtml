@@ -1,0 +1,44 @@
+﻿@model prjRemenSuperMarket.Models.SalesInfo
+
+@{
+    ViewData["Title"] = "AddToCart";
+}
+
+
+<h2>加入購物車作業</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>數量確認</h4>
+        <hr />
+
+        <div class="form-group">
+
+            <div class="col-md-1">
+                輸入數量
+                @Html.TextBox("txtCount", "1",
+                    new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        <input type="hidden" name="txtFid" value="@Model.SalesInfoIdPk" />
+
+        <div class="form-group">
+            <div class="col-md-offset-0 col-md-1">
+                <input type="submit" value="確認" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("繼續購物", "Index","Home")
+</div>
+
+@*<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>*@
+}

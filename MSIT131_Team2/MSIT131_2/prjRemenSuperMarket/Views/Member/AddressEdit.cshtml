@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewData["Title"] = "地址更改";
+}
+<div style="height:160px"></div>
+<h1>地址更改</h1>
+<form method="post">
+    <div>
+        <label>地址</label>
+        <select id="seleCity" name="CityName"></select>
+        <select id="seleDist" name="DistrictName"></select>
+        <br />
+        <input type="text" id="txtAddr" style="margin-left:36px" name="Address" />
+        <input type="submit" value="送出" />
+    </div>
+</form>
+
+@section Scripts{
+    <script id="Address">
+        var xhr = new XMLHttpRequest();
+        var Distid = 1;
+        xhr.addEventListener('load', function () {
+            var data = JSON.parse(xhr.responseText);
+            data.forEach((item)=> {
+                $('#seleCity').append('<option id=' + item.cityIdPk+'>' + item.cityName + '</option>');
+        })
+        })
+        xhr.open('get', '@Url.Content("~/member/city")')
+        xhr.send()
+        $('#seleCity').change(function () {
+            Distid = $(this).find(':selected').attr('id');
+            var xhr2 = new XMLHttpRequest();
+            xhr2.addEventListener('load', function () {
+                var data = JSON.parse(xhr2.responseText);
+                $('#seleDist option').remove();
+                data.forEach((item) => {
+                    $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+                })
+                })
+
+            xhr2.open('get', '@Url.Action("District", "member")?id='+Distid)
+            xhr2.send();
+
+        })
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener('load', function () {
+            var data = JSON.parse(xhr2.responseText);
+            data.forEach((item) => {
+                $('#seleDist').append('<option id=' + item.districtIdPk + '>' + item.districtName + '</option>');
+            })
+        })
+        xhr2.open('get', '@Url.Action("District", "member")?id=1')
+        xhr2.send();
+    </script>
+}

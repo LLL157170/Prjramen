@@ -1,0 +1,115 @@
+﻿@model prjRemenSuperMarket.Models.Order
+
+@{
+    ViewData["Title"] = "Eorder";
+}
+
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/employee.jpg);">
+        <h2 class="tit6 t-center">
+            修改產品內容
+        </h2>
+    </section>
+    
+        <section class="product-details p-t-55 p-b-113" style="        background-color: #ebebeb;">
+            <div class="container">
+                <form asp-action="Editorder" enctype="multipart/form-data">
+                    <div style="padding-left:300px;padding-right:300px">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group" hidden="hidden">
+                            <label asp-for="OrderIdPk" class="control-label"></label>
+                            <input asp-for="OrderIdPk" class="form-control" readonly="readonly" name="OidPk" />
+                            <span asp-validation-for="OrderIdPk" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" style="font-size:24px;font-weight:700">訂單日期</label>
+                            <input asp-for="OrderDate" class="form-control" readonly="readonly" />
+                            <span asp-validation-for="OrderDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" style="font-size:24px;font-weight:700">到貨日期</label>
+                            <input asp-for="ShipDate" class="form-control" name="shipdate" />
+                            <span asp-validation-for="ShipDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size:24px;font-weight:700">地址</label>
+                            <div class="row">
+                                <div class="col-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                    <select id="seleCity" class="form-control t-center" name="CityName"></select>
+                                </div>
+                                <div class="col-md-3" style="padding-left:10px;padding-right:10px;margin:0px">
+                                    <select id="seleDist" class="form-control t-center" name="dis"></select>
+                                </div>
+                            </div>
+                            <div style="margin-top:10px;margin-bottom:20px">
+                                <input asp-for="ShipAddress" class="form-control" name="address" />
+                                <span asp-validation-for="ShipAddress" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" style="font-size:24px;font-weight:700">總價</label>
+                            <input asp-for="TotalPrice" class="form-control" readonly="readonly" />
+                            <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group t-center" style="margin-top:60px">
+                        <input type="submit" value="保存" class="btn btn-primary m-r-20" />
+                        <a class="btn btn-secondary m-l-20" type="submit" asp-area="" asp-controller="EMList" asp-action="Eorder">取消</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+</body>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let seleCity = document.querySelector('#seleCity')
+        let seleDist = document.querySelector('#seleDist')
+
+        //city change
+        seleCity.addEventListener('change', function () {
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        })
+
+        Load_City()
+        //add citylist
+        async function Load_City() {
+            const response = await fetch('/Member/City')
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.cityName, item.cityIdPk)
+                seleCity.options.add(opt)
+            })
+            const city = seleCity.options[seleCity.selectedIndex].value
+            Load_District(city)
+        }
+
+        // citylist
+        async function Load_District() {
+            const response = await fetch('/Member/District?id=' + seleCity.value)
+            const datas = await response.json()
+            while (seleDist.length > 0) {
+                seleDist.remove(seleDist.length - 1)
+            }
+            datas.forEach((item) => {
+                const opt = new Option(item.districtName, item.districtIdPk)
+                seleDist.options.add(opt)
+            })
+        }
+
+    @*function Set_Selector_Value_From_Model(Selector) {
+        switch (Selector) {
+            case seleCity: return @Model.City;
+            case seleDist: return @Model.District;
+            default: return 1;
+        }
+    }*@
+
+    </script>
+}

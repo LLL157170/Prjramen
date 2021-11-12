@@ -1,0 +1,232 @@
+﻿@{
+    ViewData["Title"] = "List";
+}
+
+@section Styles{
+    <style>
+        .table {
+            font-size: 95%;
+        }
+
+        th, tr {
+            text-align: center;
+        }
+    </style>
+}
+
+<link rel="stylesheet" href="~/css/site.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/employee.jpg);">
+        <h2 class="tit6 t-center">
+            貨物管理
+        </h2>
+    </section>
+    <section class="p-t-10" style="        background-color: #ebebeb;">
+        <div class="container">
+            <p>
+                <div class="form-row">
+                    <div class="col-10">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal" id="AddBtn" style="margin-top:16px;">新增貨物</button>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-primary" id="Demo1">Demo 1</button>
+                    </div>
+
+                    <div class="col-1">
+                        <button class="btn btn-primary" id="Demo2">Demo 2</button>
+                    </div>
+                </div>
+
+                <hr style="height:2px">
+
+                <div class="form-row">
+                    <div class="col-md-2 mb-3">
+                        <label>貨物名稱</label>
+                        <input id="SelProduct" list="ProductList" class="form-control border" placeholder="輸入產品關鍵字..." />
+                        <datalist id="ProductList"></datalist>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="control-label">貨物狀態</label>
+                        <select id="SelState" class="form-select"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="SearchBtn" type="button" class="btn btn-info" style="margin-top:30px">查詢</button>
+                    </div>
+                </div>
+            </p>
+
+            <div id="theDiv"></div>
+
+            <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="ModalLabel">新增貨物</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" id="SubmitButton">新增貨物</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+
+@section Scripts{
+    <script>
+
+        async function Load_Selector_List(Selector, LoadList) {
+            const response = await fetch('/SelectorList/' + LoadList)
+            const datas = await response.json()
+
+            $(Selector).empty()
+
+            await $.each(datas, (index, data) => {
+                if ($(Selector).attr('id') == 'ProductList')
+                    $('<option/>').data('PID', data.id).text(data.name).appendTo(Selector)
+                else
+                    $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+            })
+
+            //if ($(Selector).attr('id') == 'SelCategory')
+            //    $('#theDiv').load(`/Goods/_Good_List_View?CDID=${$('#SelCategory').val()}`)
+        }
+
+        //$('#SelCategory').change(() => {
+        //    Load_Selector_List($('#SelProduct'), 'Filter_All_ProductName?CategoryDetailID=' + $('#SelCategory').val())
+        //    $('#theDiv').load(`/Goods/_Good_List_View?CDID=${$('#SelCategory').val()}&StateID=${$('#SelState').val()}`)
+        //})
+
+        //$('#SelProduct').change(() => {
+        //    $('#theDiv').load(`/Goods/_Good_List_View?ProductID=${$('#SelProduct').val()}&CDID=${$('#SelCategory').val()}&StateID=${$('#SelState').val()}`)
+        //})
+
+        //$('#SelState').change(() => {
+        //    $('#theDiv').load(`/Goods/_Good_List_View?ProductID=${$('#SelProduct').val()}&CDID=${$('#SelCategory').val()}&StateID=${$('#SelState').val()}`)
+        //})
+
+        $('#SearchBtn').click(() => {
+            $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+        })
+
+
+        //Load_Selector_List($('#SelCategory'), 'CategoryDetails')
+        Load_Selector_List($('#ProductList'), 'ProductName')
+        Load_Selector_List($('#SelState'), 'All_ProductStatus')
+        $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+
+        let IsCreate = true
+        let ModalLabel = $('#ModalLabel')
+        let SubmitButton = $('#SubmitButton')
+
+        function Load_Create_Goods_Page() {
+            IsCreate = true
+            ModalLabel.text('新增貨物')
+            SubmitButton.text('新增')
+            SubmitButton.off('click')
+            SubmitButton.click(Create_New_Goods)
+
+            $('.modal-body').load('/Goods/_Create_Goods_View');
+        }
+
+        function Load_Edit_Goods_Page() {
+            IsCreate = false
+            ModalLabel.text('修改貨物')
+            SubmitButton.text('修改')
+            SubmitButton.off('click')
+            SubmitButton.click(Edit_New_Goods)
+
+            const EditID = $(this).parents('tr').find('td:last-child').text()
+            $('.modal-body').load('/Goods/_Edit_Goods_View?id=' + EditID);
+        }
+
+        function Delete_Goods() {
+            const DeleteID = $(this).parents('tr').find('td:last-child').text()
+
+            let del = confirm('確定要刪除這筆貨物嗎？')
+
+            if (del) {
+                $.ajax({
+                    url: url + '/' + DeleteID,
+                    type: 'DELETE',
+                }).done(() => {
+                    $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+                }).fail((error) => {
+                    alert(error.responseText)
+                })
+            }
+        }
+
+        const url = "https://localhost:44333/api/APIGoods"
+
+        //新增貨物
+        function Create_New_Goods() {
+            if ($('form').valid() && $('#SelProductName').val() != 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    contentType: 'application/json',
+                    data: JsonData(),
+                }).done((data) => {
+                    if (data !== undefined)
+                        alert(data)
+                    $('#addModal').modal('hide')
+                    $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+                })
+            }
+        }
+
+        //修改貨物
+        function Edit_New_Goods() {
+            if ($('form').valid() && $('#SelProductName').val() != 0) {
+                $.ajax({
+                    type: 'PUT',
+                    url: url,
+                    contentType: 'application/json',
+                    data: JsonData(),
+                }).done((data) => {
+                    if (data !== undefined)
+                        alert(data)
+                    $('#addModal').modal('hide')
+                    $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+                })
+            }
+        }
+
+        //取得更改的貨物資訊(JSON Data)
+        function JsonData() {
+            var data = $('form').serializeArray().reduce(function (obj, item) {
+                if (item.value != "")
+                    obj[item.name] = item.value;
+
+                return obj;
+            }, {});
+
+            console.log(JSON.stringify(data))
+
+            return JSON.stringify(data)
+        }
+
+        $('#AddBtn').click(Load_Create_Goods_Page)
+        $('#Demo1').click(() => {
+            fetch('/Goods/Demo1')
+            $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+        })
+
+        $('#Demo2').click(async function () {
+           fetch('/Goods/Demo2')
+            $('#theDiv').load(`/Goods/_Good_List_View?KeyWord=${$('#SelProduct').val()}&StateID=${$('#SelState').val()}`)
+        })
+    </script>
+}
+

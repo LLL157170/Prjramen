@@ -1,0 +1,118 @@
+﻿@model prjRemenSuperMarket.ViewModel.CProductDetail
+
+@{
+    ViewData["Title"] = "Create";
+}
+<div style="height:200px"></div>
+<h1>新增產品</h1>
+<button id="demo" class="btn btn-primary">DEMO</button>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" hidden="hidden">
+                <label asp-for="ProductIdPk" class="control-label"></label>
+                <input asp-for="ProductIdPk" class="form-control" />
+                <span asp-validation-for="ProductIdPk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductName" class="control-label"></label>
+                <input asp-for="ProductName" class="form-control border" id="ProductName" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">原物料類別</label>
+                <select class="form-control" id="SelCategory"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryDetailIdFk" class="control-label"></label>
+                <select asp-for="CategoryDetailIdFk" class="form-control" id="SelCategoryDetail"></select>
+                <span asp-validation-for="CategoryDetailIdFk" class="text-danger"></span>
+
+            </div>
+            <div class="form-group">
+                <label asp-for="StorageIdFk" class="control-label"></label>
+                <select asp-for="StorageIdFk" class="form-control" id="SelStorage"></select>
+                <span asp-validation-for="StorageIdFk" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Weight" class="control-label"></label>
+                <input asp-for="Weight" class="form-control border" id="Weight" />
+                <span asp-validation-for="Weight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Specification" class="control-label"></label>
+                <input asp-for="Specification" class="form-control border" id="Specification" />
+                <span asp-validation-for="Specification" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Origin" class="control-label"></label>
+                <input asp-for="Origin" class="form-control border" id="Origin" />
+                <span asp-validation-for="Origin" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Storagedays" class="control-label"></label>
+                <input asp-for="Storagedays" class="form-control border" id="Storagedays" />
+                <span asp-validation-for="Storagedays" class="text-danger"></span>
+            </div>Origin
+            <div class="form-group">
+                <label asp-for="Picture" class="control-label"></label>
+                <input name="Photo" type="file" class="form-control border" />
+                <span asp-validation-for="Picture" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductDescription" class="control-label"></label>
+                <textarea asp-for="ProductDescription" class="form-control border" rows="6" id="introduce"></textarea>
+                <span asp-validation-for="ProductDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="新增產品" class="btn btn-primary" />
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div>
+    <a asp-action="List">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        let SelCategory = document.querySelector('#SelCategory')
+        let SelCategoryDetail = document.querySelector('#SelCategoryDetail')
+        let SelStorage = document.querySelector('#SelStorage')
+
+        async function Load_Selector_List(Selector, LoadList) {
+            const response = await fetch('/SelectorList/' + LoadList)
+            const datas = await response.json()
+
+            datas.forEach((item) => {
+                const opt = new Option(item.name, item.id)
+                Selector.options.add(opt)
+            })
+        }
+
+        function SelCategory_Change() {
+            SelCategoryDetail.innerHTML = ''
+            Load_Selector_List(SelCategoryDetail, 'CategoryDetails?CategoryID=' + SelCategory.value)
+        }
+
+        SelCategory.addEventListener('change', SelCategory_Change)
+        Load_Selector_List(SelCategory, 'Category')
+        Load_Selector_List(SelStorage, 'Storage')
+        Load_Selector_List(SelCategoryDetail, 'CategoryDetails?CategoryID=1')
+
+        $('#demo').click(() => {
+            $('#ProductName').val('大白菜')
+            $('#Weight').val('250g±10%')
+            $('#Specification').val("簡裝")
+            $('#Origin').val("台灣")
+            $('#Storagedays').val(10)
+            $('#introduce').val("利用耐熱試材新育成的早熟一代雜交種。具有特強的耐熱、耐濕、抗病毒、抗軟腐能力")
+        })
+    </script>
+}

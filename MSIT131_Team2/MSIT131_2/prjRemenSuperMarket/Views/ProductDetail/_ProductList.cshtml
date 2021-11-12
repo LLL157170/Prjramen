@@ -1,0 +1,73 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CProductDetail>
+
+<div style="height:40px"></div>
+
+<style>
+    .table {
+        width: max-content;
+        font-size: 95%;
+    }
+
+    tr, th {
+        text-align:center;
+    }
+</style>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>編號</th>
+            <th>@Html.DisplayNameFor(model => model.ProductName)</th>
+            <th>@Html.DisplayNameFor(model => model.TextCategoryDetail)</th>
+            <th>@Html.DisplayNameFor(model => model.Picture)</th>
+            <th>@Html.DisplayNameFor(model => model.Specification)</th>
+            <th>@Html.DisplayNameFor(model => model.Weight)</th>
+            <th>@Html.DisplayNameFor(model => model.Origin)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_Storage)</th>
+            <th>@Html.DisplayNameFor(model => model.Storagedays)</th>
+            <th>@Html.DisplayNameFor(model => model.ProductDescription)</th>
+            <th>@Html.DisplayNameFor(model => model.Views)</th>
+            <th>編輯</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count = 0;
+            @foreach (var item in Model)
+            {
+                count++;
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TextCategoryDetail)</td>
+                    <td><img src="data:image/jpeg;base64,@item.PictureBase64" width="100" /></td>
+                    <td>@Html.DisplayFor(modelItem => item.Specification)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Weight)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Origin)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_Storage)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Storagedays)</td>
+                    <td width="180px" style="text-align:left">
+                        @Html.DisplayFor(modelItem => item.ProductDescription)
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Views)</td>
+                    <td>
+                        @Html.ActionLink("修改", "Edit",
+                                            new { id = item.ProductIdPk },
+                                            new { Class = "btn btn-success" })
+                        @Html.ActionLink("刪除", "Delete", "ProductDetail",
+                                            new { id = item.ProductIdPk },
+                                            new { Class = "btn btn-danger",
+                                                onclick = "return confirm('確定要刪除嗎?')"})
+                    </td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+
+
+
+
+
+

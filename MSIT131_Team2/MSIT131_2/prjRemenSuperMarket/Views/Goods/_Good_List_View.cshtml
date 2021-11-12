@@ -1,0 +1,62 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.CGoods>
+
+<table class="table table-borderless">
+    <thead>
+        <tr>
+            <th>編號</th>
+            <th>@Html.DisplayNameFor(model => model.ProductName)</th>
+            <th>@Html.DisplayNameFor(model => model.EmployeeName)</th>
+            <th>@Html.DisplayNameFor(model => model.MerchantName)</th>
+            <th>@Html.DisplayNameFor(model => model.Counts)</th>
+            <th>@Html.DisplayNameFor(model => model.PurchaseCost)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_PurchaseDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_ShelfLife)</th>
+            <th>@Html.DisplayNameFor(model => model.Text_LaunchDate)</th>
+            <th>@Html.DisplayNameFor(model => model.ProductStatus)</th>
+            <th>編輯</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count = 0;
+            @foreach (var item in Model)
+            {
+                count++;
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MerchantName)</td>
+                    <td name="count">@Html.DisplayFor(modelItem => item.Counts)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PurchaseCost)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_PurchaseDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_ShelfLife)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Text_LaunchDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductStatus)</td>
+                    <td>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal" name="EditBtn">修改</button>
+                        <button class="btn btn-danger" name="DeleteBtn">刪除</button>
+                    </td>
+                    <td id="GoodsIdPk" hidden="hidden">@Html.DisplayFor(modelItem => item.GoodsIdPk)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@if (count == 0)
+{
+    <h2 style="color:red; text-align:center">沒有符合條件的貨物</h2>
+}
+
+<script>
+    $('button[name="EditBtn"]').click(Load_Edit_Goods_Page)
+    $('button[name="DeleteBtn"]').click(Delete_Goods)
+
+    $.each($('td[name="count"]'), (index, ele) => {
+        if (Number($(ele).text()) == 0) {
+            $(ele).css({ 'color': 'red' })
+            $(ele).siblings('td').css({ 'color': 'red' })
+        }
+    })
+</script>

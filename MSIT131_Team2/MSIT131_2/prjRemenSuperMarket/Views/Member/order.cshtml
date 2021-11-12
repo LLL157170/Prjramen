@@ -1,0 +1,86 @@
+﻿@model IEnumerable<prjRemenSuperMarket.ViewModel.COrderViewModel>
+
+@{
+    ViewData["Title"] = "order";
+}
+
+@section Styles{
+    <style>
+    </style>
+}
+
+<body>
+    <section class="bg-title-page flex-c-m p-t-160 p-b-80 p-l-15 p-r-15" style="        background-image: url(/images/order.jpg);">
+        <h2 class="tit6 t-center">
+            我的訂單
+        </h2>
+    </section>
+    <section class="product-details bg2-pattern p-t-55 p-b-113">
+        <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OrderDate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShipDate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ShipAddress)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.TotalPrice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Payment)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.DeliveryStatus)
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OrderDate)
+                            </td>
+                            <td id="shipdate">
+                                @Html.DisplayFor(modelItem => item.ShipDate)
+                            </td>
+                            <td>
+                                @item.City @item.District @item.ShipAddress
+                            </td>
+                            <td id="totalprice">
+                                $ @((int?)item.TotalPrice) 
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Payment)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DeliveryStatus)
+                            </td>
+                            <td class="social-cust-ColorToDeep">
+                                @Html.ActionLink("檢視", "OrderDetail", "Member", new { orderId = item.OrderIdPk }, new { @class = "btn" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination flex-c-m flex-w p-l-15 p-r-15 m-t-24 m-b-50" id="Page">
+            <button class="item-pagination flex-c-m trans-0-4 active-pagination">1</button>
+        </div>
+    </section>
+
+</body>
+<script>
+    function content() {
+        let totalprice = $('#totalprice').text()
+        console.log(totalprice)
+    }
+    content()
+</script>

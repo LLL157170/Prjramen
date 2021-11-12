@@ -1,0 +1,163 @@
+﻿@model prjRemenSuperMarket.ViewModel.CStoreAdd
+<style>
+    td > div {
+        margin-bottom: 5px;
+    }
+
+    div > label {
+        font-size: 18px;
+    }
+
+    #ImgLogo, #ImgPicture {
+        border: 5px solid gray;
+        width: 250px;
+        height: 250px;
+    }
+
+</style>
+
+<form enctype="multipart/form-data" name="theForm">
+    <table>
+        <tbody>
+            <tr>
+                <td width="600px">
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label asp-for="StoreName" class="control-label"></label>
+                            <input asp-for="StoreName" class="form-control border" />
+                            <span asp-validation-for="StoreName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-3">
+                            <label asp-for="CityId" class="control-label"></label>
+                            <select id="SelCity" asp-for="CityId" class="form-select"></select>
+                            <span asp-validation-for="CityId"></span>
+                        </div>
+                        <div class="col-3">
+                            <label asp-for="DistrictId" class="control-label"></label>
+                            <select id="SelDist" asp-for="DistrictId" class="form-select"></select>
+                            <span asp-validation-for="DistrictId"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Address" class="control-label"></label>
+                            <input asp-for="Address" class="form-control border" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label asp-for="Phone" class="control-label"></label>
+                            <input asp-for="Phone" class="form-control border" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label asp-for="Introduce" class="control-label"></label>
+                            <textarea asp-for="Introduce" class="form-control border" rows="5"></textarea>
+                            @*<input asp-for="Introduce" class="form-control border"/>*@
+                            <span asp-validation-for="Introduce" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </td>
+
+                <td width="800px" style="vertical-align:central; justify-content:center">
+                    <div class="form-row">
+                        <div class="col-1"></div>
+
+                        <div class="col-5">
+                            <label asp-for="Logo" class="control-label">推廣照</label>
+                        </div>
+
+                        <div class="col-5">
+                            <label asp-for="Picture" class="control-label">封面照</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-1"></div>
+
+                        <div class="col-5">
+                            <img id="ImgLogo" />
+                        </div>
+
+                        <div class="col-5">
+                            <img id="ImgPicture" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-1"></div>
+
+                        <div class="col-5">
+                            <input id="InpLogo" type="file" asp-for="Logo" class="form-control border" onchange="readURL(this);" />
+                            <span asp-validation-for="Logo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-5">
+                            <input id="InpPicture" type="file" asp-for="Picture" class="form-control border" onchange="readURL(this);" />
+                            <span asp-validation-for="Picture" class="text-danger"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+<script type="text/javascript" src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    async function Load_Selector_List(Selector, LoadList) {
+        $(Selector).empty()
+
+        const response = await fetch('/SelectorList/' + LoadList)
+        const datas = await response.json()
+
+        $.each(datas, (index, data) => {
+            $('<option/>').val(data.id).text(data.name).appendTo(Selector)
+        })
+
+        if ($(Selector).attr('id') == 'SelCity')
+            Load_Selector_List($('#SelDist'), 'District?CityID=' + $('#SelCity').val())
+    }
+
+    $('#SelCity').change(() => {
+        Load_Selector_List($('#SelDist'), 'District?CityID=' + $('#SelCity').val())
+    })
+
+    Load_Selector_List($('#SelCity'), 'City')
+
+    function readURL(input) {
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                switch ($(input).attr('id')) {
+                    case 'InpLogo':
+                        $('#ImgLogo').attr('src', e.target.result)
+                        break;
+                    case 'InpPicture':
+                        $('#ImgPicture').attr('src', e.target.result)
+                        break;
+                }
+                
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#demo").click(function () {
+        $("#StoreName").val("匠心拉麵");
+        $("#SelCity").val(18);
+        Load_Selector_List($('#SelDist'), 'District?CityID=18' )
+        $("#Phone").val("038316399");
+        $("#Address").val("明禮路12號");
+        $("#Introduce").val("匠心的每一種拉麵湯頭都擁有各自的擁戴者，老闆捨棄了便宜的大骨湯粉、高湯粉等人工調味料光是最基礎的豚骨湯頭，都是用新鮮的大骨炙燒後再加入多種蔬菜熬煮數日的而成，滴滴都顯得珍貴配料有軟嫩的溏心蛋、鮮脆的筍絲以及青脆的黑木耳細絲，更是襯托出了豚骨湯頭的鹹香濃郁麵條的部分Q彈有嚼勁，搭配入口即化的軟爛叉燒肉更是完美");
+    });
+</script>

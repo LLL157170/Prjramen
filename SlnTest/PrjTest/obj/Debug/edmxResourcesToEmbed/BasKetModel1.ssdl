@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BasketBallModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Area">
+    <Key>
+      <PropertyRef Name="AreaID" />
+    </Key>
+    <Property Name="AreaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Area" Type="nvarchar" MaxLength="10" />
+  </EntityType>
+  <EntityType Name="Iteminformation">
+    <Key>
+      <PropertyRef Name="ItemID" />
+    </Key>
+    <Property Name="ItemID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ItemName" Type="nvarchar" MaxLength="20" />
+    <Property Name="ProductId" Type="int" />
+    <Property Name="TeamID" Type="int" />
+    <Property Name="price" Type="money" />
+    <Property Name="picture" Type="image" />
+  </EntityType>
+  <EntityType Name="PlayerInformation">
+    <Key>
+      <PropertyRef Name="PlayerID" />
+    </Key>
+    <Property Name="PlayerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="20" />
+    <Property Name="Position" Type="nchar" MaxLength="10" />
+    <Property Name="Height" Type="int" />
+    <Property Name="Weight" Type="int" />
+    <Property Name="Country" Type="nvarchar" MaxLength="10" />
+    <Property Name="TeamID" Type="int" />
+    <Property Name="Picture" Type="image" />
+  </EntityType>
+  <EntityType Name="Product">
+    <Key>
+      <PropertyRef Name="ProductId" />
+    </Key>
+    <Property Name="ProductId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ProductName" Type="nvarchar" MaxLength="10" />
+  </EntityType>
+  <EntityType Name="TeamInformation">
+    <Key>
+      <PropertyRef Name="TeamID" />
+    </Key>
+    <Property Name="TeamID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TeamName" Type="nvarchar" MaxLength="20" />
+    <Property Name="City" Type="nvarchar" MaxLength="30" />
+    <Property Name="AreaID" Type="int" />
+    <Property Name="CreatYear" Type="nvarchar" MaxLength="20" />
+    <Property Name="Picture" Type="image" />
+  </EntityType>
+  <Association Name="FK_Area_TeamInformation">
+    <End Role="Area" Type="Self.Area" Multiplicity="0..1" />
+    <End Role="TeamInformation" Type="Self.TeamInformation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Area">
+        <PropertyRef Name="AreaID" />
+      </Principal>
+      <Dependent Role="TeamInformation">
+        <PropertyRef Name="AreaID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Product_Iteminformation">
+    <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+    <End Role="Iteminformation" Type="Self.Iteminformation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Product">
+        <PropertyRef Name="ProductId" />
+      </Principal>
+      <Dependent Role="Iteminformation">
+        <PropertyRef Name="ProductId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Team_PlayerInformation">
+    <End Role="TeamInformation" Type="Self.TeamInformation" Multiplicity="0..1" />
+    <End Role="PlayerInformation" Type="Self.PlayerInformation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TeamInformation">
+        <PropertyRef Name="TeamID" />
+      </Principal>
+      <Dependent Role="PlayerInformation">
+        <PropertyRef Name="TeamID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Teaminformation_ItemInformation">
+    <End Role="TeamInformation" Type="Self.TeamInformation" Multiplicity="0..1" />
+    <End Role="Iteminformation" Type="Self.Iteminformation" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TeamInformation">
+        <PropertyRef Name="TeamID" />
+      </Principal>
+      <Dependent Role="Iteminformation">
+        <PropertyRef Name="TeamID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="BasketBallModelStoreContainer">
+    <EntitySet Name="Area" EntityType="Self.Area" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Iteminformation" EntityType="Self.Iteminformation" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PlayerInformation" EntityType="Self.PlayerInformation" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TeamInformation" EntityType="Self.TeamInformation" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Area_TeamInformation" Association="Self.FK_Area_TeamInformation">
+      <End Role="Area" EntitySet="Area" />
+      <End Role="TeamInformation" EntitySet="TeamInformation" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Product_Iteminformation" Association="Self.FK_Product_Iteminformation">
+      <End Role="Product" EntitySet="Product" />
+      <End Role="Iteminformation" EntitySet="Iteminformation" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Team_PlayerInformation" Association="Self.FK_Team_PlayerInformation">
+      <End Role="TeamInformation" EntitySet="TeamInformation" />
+      <End Role="PlayerInformation" EntitySet="PlayerInformation" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Teaminformation_ItemInformation" Association="Self.FK_Teaminformation_ItemInformation">
+      <End Role="TeamInformation" EntitySet="TeamInformation" />
+      <End Role="Iteminformation" EntitySet="Iteminformation" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
